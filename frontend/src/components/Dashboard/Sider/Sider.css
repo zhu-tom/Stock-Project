@@ -1,0 +1,10 @@
+.logo {
+    justify-content:center;
+    width: 100%;
+    height: 60px; 
+    text-align: center;
+    padding: 10px;
+    color: #fff;
+    font-size: 12pt;
+    font-weight: bold;
+}
