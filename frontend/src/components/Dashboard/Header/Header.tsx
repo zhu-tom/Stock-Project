@@ -1,5 +1,5 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Col, Input, Layout, Menu, Row, Space, Typography } from 'antd';
+import { Avatar, Badge, Col, Input, Layout, Menu, Row } from 'antd';
 import * as React from 'react';
 
 const data: string[] = ["Notification 1", "Notification 2","Notification 3"];

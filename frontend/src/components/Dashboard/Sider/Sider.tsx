@@ -1,6 +1,6 @@
-import { Affix, Layout, Menu, Space } from 'antd';
+import { Layout, Menu, Space } from 'antd';
 import * as React from 'react';
-import { BankFilled, BellOutlined, BookOutlined, CompassOutlined, EyeOutlined, FundProjectionScreenOutlined, HistoryOutlined, MenuFoldOutlined, MenuUnfoldOutlined, ReadOutlined, ShopOutlined, TagsOutlined } from "@ant-design/icons";
+import { BankFilled, BellOutlined, BookOutlined, CompassOutlined, EyeOutlined, FundProjectionScreenOutlined, HistoryOutlined, ReadOutlined, ShopOutlined, TagsOutlined } from "@ant-design/icons";
 
 import './Sider.css';
 
