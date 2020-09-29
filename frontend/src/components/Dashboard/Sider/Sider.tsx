@@ -3,6 +3,7 @@ import * as React from 'react';
 import { BankFilled, BellOutlined, BookOutlined, CompassOutlined, EyeOutlined, FundProjectionScreenOutlined, HistoryOutlined, ReadOutlined, ShopOutlined, TagsOutlined } from "@ant-design/icons";
 
 import './Sider.css';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 type Props = {
     collapsed: boolean;
@@ -13,7 +14,64 @@ type State = {
     collapsedWidth: number;
 }
 
-class Sider extends React.Component<Props, State> {
+type MenuItem = {
+    location: string,
+    icon: React.ReactNode,
+    title: string,
+    children?: MenuItem[]
+}
+
+const menuItems: MenuItem[] = [
+    {
+        location: '/',
+        icon: <CompassOutlined/>,
+        title: 'Home', 
+    },
+    {
+        location: '/account',
+        icon: <BookOutlined/>,
+        title: 'Account',
+        children: [
+            {
+                location: '/account/portfolio',
+                icon: <FundProjectionScreenOutlined/>,
+                title: 'Portfolio'
+            }, 
+            {
+                location: '/account/watchlist',
+                icon: <EyeOutlined/>,
+                title: 'Watchlist',
+            },
+            {
+                location: '/account/subscriptions',
+                icon: <BellOutlined/>,
+                title: 'Subscriptions'
+            },
+            {
+                location: '/account/orders',
+                icon: <TagsOutlined/>,
+                title: 'Orders',
+            },
+            {
+                location: '/account/history',
+                icon: <HistoryOutlined/>,
+                title: 'History'
+            }
+        ]
+    },
+    {
+        location: '/market',
+        icon: <ShopOutlined/>,
+        title: 'Market'
+    },
+    {
+        location: '/news',
+        icon: <ReadOutlined/>,
+        title: 'News'
+    }
+];
+
+class Sider extends React.Component<RouteComponentProps<{}> & Props, State> {
     static defaultProps: Props = {
         collapsed: false,
         setCollapsed: () => {},
@@ -25,6 +83,7 @@ class Sider extends React.Component<Props, State> {
 
     onBreakpoint = (broken: boolean) => this.setState({collapsedWidth: broken ? 0:80});
     onCollapse = (collapsed: boolean) => this.props.setCollapsed(collapsed);
+    createItem = ({icon, title, location}: MenuItem) => <Menu.Item icon={icon} key={location}><Link to={location}>{title}</Link></Menu.Item>;
 
     render() {
         return (
@@ -43,23 +102,22 @@ class Sider extends React.Component<Props, State> {
                         left: 0,
                     }}>
                     <Space align="center" className="logo">
-                        <BankFilled/>{!this.props.collapsed && 'Bank Street Bets'}
+                        <BankFilled/>{!this.props.collapsed && <span>{'Bank Street Bets'}</span>}
                     </Space>
-                    <Menu style={{padding: 0}} defaultOpenKeys={["acc"]} theme="dark" mode="inline">
-                        <Menu.Item key="1" icon={<CompassOutlined/>}>Dashboard</Menu.Item>
-                        <Menu.SubMenu key="acc" icon={<BookOutlined/>} title="Account">
-                            <Menu.Item key="2" icon={<FundProjectionScreenOutlined/>}>Portfolio</Menu.Item>
-                            <Menu.Item key="3" icon={<EyeOutlined/>}>Watchlist</Menu.Item>
-                            <Menu.Item key="4" icon={<BellOutlined/>}>Subscriptions</Menu.Item>
-                            <Menu.Item key="5" icon={<TagsOutlined/>}>Orders</Menu.Item>
-                            <Menu.Item key="8" icon={<HistoryOutlined/>}>History</Menu.Item>
-                        </Menu.SubMenu>
-                        <Menu.Item key="6" icon={<ShopOutlined/>}>Market</Menu.Item>
-                        <Menu.Item key="7" icon={<ReadOutlined/>}>News</Menu.Item>
+                    <Menu style={{padding: 0}} selectedKeys={[this.props.location.pathname]} defaultOpenKeys={["/account"]} theme="dark" mode="inline">
+                        {menuItems.map((item) => {
+                            return item.children ? (
+                                <Menu.SubMenu key={item.location} icon={item.icon} title={item.title}>
+                                    {item.children.map(this.createItem)}
+                                </Menu.SubMenu>
+                            ) : (
+                                this.createItem(item)
+                            );
+                        })}
                     </Menu>
                 </Layout.Sider>            
         );
     }
 }
 
-export default Sider;
+export default withRouter(Sider);

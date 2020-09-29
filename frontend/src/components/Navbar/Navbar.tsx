@@ -14,8 +14,8 @@ const Navbar: React.FC<{}> = () => {
                         <MenuItem key="3">News</MenuItem>
                     </Menu>
                 </Col>
-                <Col xs={12} style={{display: 'flex', justifyContent: 'end', alignItems:'center'}}>
-                    <Space>
+                <Col xs={12} >
+                    <Space style={{float: 'right'}}>
                         <Button type="primary" shape="round">Sign Up</Button>
                         <Button type="default" shape="round">Login</Button>
                     </Space>

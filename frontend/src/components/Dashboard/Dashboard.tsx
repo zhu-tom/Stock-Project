@@ -10,12 +10,13 @@ type Props = {
 
 const Dashboard: React.FC<Props> = ({children}) => {
     const [siderCollapsed, setSiderCollapsed] = React.useState(false);
+
     return (
         <Layout>
             <Sider collapsed={siderCollapsed} setCollapsed={setSiderCollapsed}/>
-            <Layout>
+            <Layout style={{minHeight: '100vh'}}>
                 <Header siderCollapsed={siderCollapsed} setSiderCollapsed={setSiderCollapsed} />
-                <Layout.Content style={{height: '100vh'}}>
+                <Layout.Content>
                     {children}
                 </Layout.Content>
                 <Footer/>

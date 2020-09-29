@@ -1,8 +1,10 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Dashboard from './components/Dashboard/Dashboard';
-import SignUp from './components/SignUp/SignUp';
+import SignUp from './components/Forms/SignUp/SignUp';
+import Home from './components/Home/Home';
+import Crumb from './components/Dashboard/Breadcrumb/Breadcrumb';
 
 function App() {
   return (
@@ -15,9 +17,23 @@ function App() {
       </Route>
       <Route path="/">
         <Dashboard>
+          <Switch>
+            <Route path="/account/portfolio">
+              <Crumb/>
+            </Route>
+            <Route path="/market">
 
+            </Route>
+            <Route path="/">
+              <Home/>
+            </Route>
+            <Route>
+              <Redirect to="/"/>
+            </Route>
+          </Switch>
         </Dashboard>
       </Route>
+      
     </Switch>
   );
 }

@@ -1,6 +1,6 @@
 import { Button, Card, Col, Form, Input, Row } from 'antd';
 import * as React from 'react';
-import Landing from '../Landing/Landing';
+import Landing from '../../Landing/Landing';
 
 type State = {
 
