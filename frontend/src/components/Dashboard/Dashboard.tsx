@@ -16,7 +16,7 @@ const Dashboard: React.FC<Props> = ({children}) => {
             <Sider collapsed={siderCollapsed} setCollapsed={setSiderCollapsed}/>
             <Layout style={{minHeight: '100vh'}}>
                 <Header siderCollapsed={siderCollapsed} setSiderCollapsed={setSiderCollapsed} />
-                <Layout.Content>
+                <Layout.Content style={{padding: '16px'}}>
                     {children}
                 </Layout.Content>
                 <Footer/>

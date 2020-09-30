@@ -1,5 +1,4 @@
 import { Breadcrumb } from 'antd';
-import { BreadcrumbProps } from 'antd/lib/breadcrumb';
 import * as React from 'react';
 import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
@@ -23,11 +22,11 @@ const Crumb: React.FC<RouteComponentProps<{}>> = ({location}) => {
     const parts = location.pathname.split(/(?=\/)/);
     console.log(parts);
     return (
-        <Breadcrumb separator=">">
+        <Breadcrumb style={{marginBottom: '16px'}} separator=">">
             {parts.map((key, index) => {
                 return (
                     <Breadcrumb.Item>
-                        {key === '/account' ? <span>{map[key]}</span> : (<Link to={parts.slice(0, index + 1).join('')}>{map[key]}</Link>)}
+                        {key === '/account' || index === parts.length - 1 ? <span>{map[key]}</span> : (<Link to={parts.slice(0, index + 1).join('')}>{map[key]}</Link>)}
                     </Breadcrumb.Item>
                 );
             })}

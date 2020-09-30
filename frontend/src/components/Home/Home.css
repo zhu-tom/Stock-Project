@@ -1,0 +1,23 @@
+.ant-col > .ant-layout {
+    background-color: #fff;
+    padding: 24px;
+}
+
+.big-stat .ant-statistic-content-value-int {
+    font-size: 48px;
+}
+
+.big-stat .ant-statistic-content-value-decimal {
+    font-size: 24px;
+}
+
+.big-stat .ant-statistic-content-prefix {
+    font-size: 36px;
+}
+
+.center-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
