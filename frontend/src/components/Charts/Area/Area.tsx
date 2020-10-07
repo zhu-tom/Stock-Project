@@ -1,7 +1,7 @@
 import * as React from 'react';
-import * as d3 from 'd3';
+import Chart from 'chart.js';
 
-const data: StockData[] = [{
+const data = [{
     "date": "2020-09-29T20:37:40Z",
     "value": 115.54
   }, {
@@ -301,91 +301,94 @@ const data: StockData[] = [{
   }, {
     "date": "2020-09-29T15:52:17Z",
     "value": 98.77
-}].map(val => {
-    return (
-        {
-            date: new Date(val['date']),
-            value: val['value']
-        }
-    )
-}).sort((a, b) => {
-    return a.date.getTime() - b.date.getTime();
+}].map(val => ({
+    y: val.value,
+    x: new Date(val.date),
+})).sort((a, b) => a.x.getTime() - b.x.getTime());
+
+Chart.defaults.LineWithLine = Chart.defaults.line;
+Chart.controllers.LineWithLine = Chart.controllers.line.extend({
+   draw: function(ease: any) {
+      Chart.controllers.line.prototype.draw.call(this, ease);
+
+      if (this.chart.tooltip._active && this.chart.tooltip._active.length) {
+        const activePoint = this.chart.tooltip._active[0];
+        const ctx = this.chart.ctx;
+        const x = activePoint.tooltipPosition().x;
+        const topY = this.chart.legend.bottom;
+        const bottomY = this.chart.chartArea.bottom;
+
+         // draw line
+         ctx.save();
+         ctx.beginPath();
+         ctx.moveTo(x, topY);
+         ctx.lineTo(x, bottomY);
+         ctx.lineWidth = 2;
+         ctx.strokeStyle = '#07C';
+         ctx.stroke();
+         ctx.restore();
+      }
+   }
 });
 
-type StockData = {
-    date: Date,
-    value: number,
-}
-
-class LineChart extends React.Component<{}, {}> {
-    private chartRef: React.RefObject<SVGSVGElement> = React.createRef();
-    private chartDim = {
-        width: 600,
-        height: 400,
-        margin: 25,
-    }
+class AreaChart extends React.Component<{}, {}> {
+    chartRef: React.RefObject<HTMLCanvasElement> = React.createRef();
+    myChart?: Chart;
 
     componentDidMount() {
-        const svg = d3.select(this.chartRef.current);
+        const ctx = this.chartRef.current?.getContext("2d");
 
-        // set up x scale, extent, axis
-        const xScale = d3.scaleTime();
-        const xExt = d3.extent(data, d => d.date);
+        const gradient = ctx?.createLinearGradient(0, 0, 0, 450);
+        gradient?.addColorStop(0, "rgb(0, 39, 102, 1)");
+        gradient?.addColorStop(1, "rgb(230, 247, 255, 0)");
 
-        xScale.domain([xExt[0]!, xExt[1]!])
-                .range([0, 600])
-                .ticks(d3.timeMinute.filter(d => d.getMinutes() % 60 === 0));
-        const xAxis = d3.axisBottom(xScale);
-        svg.append("g")
-            .attr('transform', `translate(${this.chartDim.margin}, ${this.chartDim.height + this.chartDim.margin})`)
-            .call(xAxis);
-    
-        // set up y scale, extent, axis
-        const yScale = d3.scaleLinear();
-        const yExt = d3.extent(data, d => d.value);
-        yScale.domain([yExt[0]!, yExt[1]!])
-                .range([400, 0])
-                .nice();
-        const yAxis = d3.axisLeft(yScale)
-                        .tickSize(this.chartDim.width);
-        svg.append("g")
-            .attr('transform', `translate(${this.chartDim.margin + this.chartDim.width}, ${this.chartDim.margin})`)
-            .call(yAxis)
-            .call(g => g.select(".domain").remove())
-            .call(g => g.selectAll(".tick:not(:first-of-type) line")
-                .attr("stroke-opacity", 0.5)
-                .attr("stroke-width", 0.7)
-                .attr("stroke-dasharray", "2,2")
-            );
-
-        // create line generator
-        const line = d3.line<StockData>();
-        line.x((d) => xScale(d.date)!).y((d) => yScale(d.value)!);             
-
-        //create area generator
-        const area = d3.area<StockData>();
-        area.x((d) => xScale(d.date)!)
-          .y0(yScale(0)!)
-          .y1((d) => yScale(d.value)!);
-
-        svg.append("path")
-            .datum(data)
-            .attr("fill", "#cce5df")
-            .attr("stroke", "#69b3a2")
-            .attr("stroke-width", 1.5)
-            .attr("transform", `translate(${this.chartDim.margin}, ${this.chartDim.margin})`)
-            .attr("stroke-linejoin", "round")
-            .attr("stroke-linecap", "round")
-            .attr("d", area(data)!);
-        
+        this.myChart = new Chart(ctx!, {
+            type: "LineWithLine",
+            options: {
+                scales: {
+                    xAxes: [
+                        {
+                            type: 'time',
+                            time: {
+                                unit: 'hour',
+                                displayFormats: {
+                                    hour: 'hA'
+                                },
+                            },
+                            distribution: 'linear',
+                            ticks: {
+                                source: 'auto'
+                            }
+                        }
+                    ]
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                elements: {
+                    point: {
+                        radius: 0
+                    }
+                }
+            },
+            data: {
+                datasets: [
+                    {
+                        fill: 'start',
+                        label: 'Your Portfolio',
+                        data: data,
+                        backgroundColor: gradient,
+                        
+                    },
+                ]
+            },
+        });
     }
 
     render() {
-        return (
-            <svg ref={this.chartRef} height={this.chartDim.height + 2 * this.chartDim.margin}>
-            </svg>
-        );
+        return <canvas ref={this.chartRef}></canvas>
     }
 }
 
-export default LineChart;
+export default AreaChart;
