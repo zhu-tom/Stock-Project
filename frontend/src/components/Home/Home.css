@@ -1,4 +1,4 @@
-.ant-col > .ant-layout {
+.ant-col > .ant-layout, .ant-tabs-tabpane > section {
     background-color: #fff;
     padding: 24px;
 }

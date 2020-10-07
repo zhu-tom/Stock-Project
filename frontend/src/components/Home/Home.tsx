@@ -1,7 +1,7 @@
 import { ArrowDownOutlined, ArrowUpOutlined, DollarCircleFilled, FundFilled } from '@ant-design/icons';
-import { Col, Divider, Layout, Row, Space, Statistic } from 'antd';
+import { Col, Divider, Layout, Row, Space, Statistic, Tabs } from 'antd';
 import * as React from 'react';
-import LineChart from '../Charts/Line/Line';
+import AreaChart from '../Charts/Area/Area';
 import Breadcrumb from '../Dashboard/Breadcrumb/Breadcrumb';
 import './Home.css';
 
@@ -21,9 +21,22 @@ const Home: React.FC<{}> = () => {
                     </Layout>
                 </Col>
                 <Col span={24}>
-                    <Layout>
-                        <LineChart/>
-                    </Layout>
+                        <Tabs type="card">
+                            <Tabs.TabPane tab="Today" key="1">
+                                <Layout className="bg-white">
+                                    <AreaChart/>
+                                </Layout>
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="This Week" key="2">
+
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="This Month" key="3">
+
+                            </Tabs.TabPane>
+                            <Tabs.TabPane tab="This Year" key="4">
+
+                            </Tabs.TabPane>
+                        </Tabs>
                 </Col>
             </Row>
         </>

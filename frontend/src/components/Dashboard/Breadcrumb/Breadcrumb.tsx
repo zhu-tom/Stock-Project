@@ -16,6 +16,8 @@ const map: StringKeys = {
     '/history': 'History',
     '/market': 'Market',
     '/news': 'Newsfeed',
+    '/deposit': 'Deposit',
+    '/withdraw': 'Withdraw'
 }
 
 const Crumb: React.FC<RouteComponentProps<{}>> = ({location}) => {
