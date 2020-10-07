@@ -1,21 +1,14 @@
 import { ArrowUpOutlined, DollarCircleFilled, FundFilled } from '@ant-design/icons';
 import { Button, Col, Layout, Row, Space, Statistic, Table, Tabs } from 'antd';
-import Breadcrumb from '../../Dashboard/Breadcrumb/Breadcrumb';
 import { ColumnsType } from 'antd/lib/table';
 import * as React from 'react';
 import AreaChart from '../../Charts/Area/Area';
 import './Home.css';
 import { Link } from 'react-router-dom';
 
-type OwnedStock = {
-    name: string,
-    symbol: string,
-    amount: number,
-    price: number,
-    avgPaid: number
-}
+import {OwnedStockType} from '../../../types/StockTypes';
 
-const data: OwnedStock[] = [
+const data: OwnedStockType[] = [
     {
         name: "Microsoft",
         symbol: "MSFT",
@@ -51,7 +44,7 @@ const Home: React.FC<{}> = () => {
     const columns: ColumnsType<any> = [
         {
             title: 'Name (Symbol)',
-            render(val: OwnedStock) {
+            render(val: OwnedStockType) {
                 return `${val.name} (${val.symbol})`;
             },
             sorter(a, b) {
@@ -66,7 +59,7 @@ const Home: React.FC<{}> = () => {
             }
         },
         {
-            title: 'Current Ask/Bid',
+            title: 'Current Value',
             dataIndex: 'price',
             sorter(a, b) {
                 return a.price - b.price;
@@ -123,7 +116,7 @@ const Home: React.FC<{}> = () => {
                         </Tabs>
                 </Col>
                 <Col xs={24}>
-                    <Table dataSource={data} columns={columns}/>
+                    <Table rowKey="symbol" dataSource={data} columns={columns}/>
                 </Col>
             </Row>
     );

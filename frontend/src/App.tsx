@@ -5,6 +5,8 @@ import Dashboard from './components/Dashboard/Dashboard';
 import SignUp from './components/Forms/SignUp/SignUp';
 import Home from './components/Home/Home';
 import Portfolio from './components/Portfolio/Portfolio';
+import Subscriptions from './components/Subscriptions/Subscriptions';
+import Watchlists from './components/Watchlists/Watchlists';
 
 function App() {
   return (
@@ -20,6 +22,12 @@ function App() {
           <Switch>
             <Route path="/account/portfolio">
               <Portfolio/>
+            </Route>
+            <Route path="/account/watchlist">
+              <Watchlists/>
+            </Route>
+            <Route path="/account/subscriptions">
+              <Subscriptions/>
             </Route>
             <Route path="/market">
 
