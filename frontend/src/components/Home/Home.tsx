@@ -1,5 +1,5 @@
-import { ArrowDownOutlined, ArrowUpOutlined, DollarCircleFilled, FundFilled } from '@ant-design/icons';
-import { Col, Divider, Layout, Row, Space, Statistic, Tabs } from 'antd';
+import { ArrowUpOutlined, DollarCircleFilled, FundFilled } from '@ant-design/icons';
+import { Col, Layout, Row, Statistic, Tabs } from 'antd';
 import * as React from 'react';
 import AreaChart from '../Charts/Area/Area';
 import Breadcrumb from '../Dashboard/Breadcrumb/Breadcrumb';
