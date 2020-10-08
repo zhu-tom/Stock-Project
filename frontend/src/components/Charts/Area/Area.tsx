@@ -331,7 +331,7 @@ Chart.controllers.LineWithLine = Chart.controllers.line.extend({
    }
 });
 
-class AreaChart extends React.Component<{}, {}> {
+class AreaChart extends React.Component<{label?: string}, {}> {
     chartRef: React.RefObject<HTMLCanvasElement> = React.createRef();
     myChart?: Chart;
 
@@ -376,7 +376,7 @@ class AreaChart extends React.Component<{}, {}> {
                 datasets: [
                     {
                         fill: 'start',
-                        label: 'Your Portfolio',
+                        label: this.props.label || "Your Portfolio",
                         data: data,
                         backgroundColor: gradient,
                         

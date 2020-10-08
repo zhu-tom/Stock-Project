@@ -55,6 +55,7 @@ const Home: React.FC<Props> = ({watchlists}) => {
                 <Input placeholder="Watchlist Name" value={watchlistName} onChange={({target}) => setWatchlistName(target.value)}/>
             </Modal>
             <Button onClick={() => setIsVisible(true)} style={{marginBottom: "16px"}} type="primary"><PlusOutlined/>Create A New Watchlist</Button>
+            {selectedRowKeys.length > 0 && <Button danger type="primary">{`Delete All (${selectedRowKeys.length})`}</Button>}
             <Table rowKey="id" rowSelection={{type: 'checkbox', ...rowSelection}} dataSource={watchlists} columns={columns}>
             </Table>
         </>

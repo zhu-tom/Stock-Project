@@ -1,44 +1,21 @@
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Switch, Table } from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { Button, Space, Switch, Table } from "antd";
 import { ColumnsType } from "antd/lib/table";
+import { TableRowSelection } from "antd/lib/table/interface";
 import * as React from "react";
+import { Link } from "react-router-dom";
 import { SubscriptionType } from "../../../types/StockTypes";
 
-const mock: SubscriptionType[] = [
-    {
-        name: "Microsoft",
-        symbol: "MSFT",
-        minChange: 5,
-        active: true,
-    },
-    {
-        name: "Apple",
-        symbol: "APPL",
-        minChange: 14,
-        active: false,
-    },
-    {
-        name: "Waste Management",
-        symbol: "WMT",
-        minChange: 10,
-        active: true,
-    }
-];
+const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: number) => void}> = ({subscriptions, handleToggle}) => {
+    const data = subscriptions;
 
-const Home = () => {
-    const [data, setData] = React.useState(mock);
+    const [selectedRowKeys, setSelectedKeys]: [React.Key[], any] = React.useState([]);
 
-    const handleChange = (i: number) => {
-        setData(data.map((val, index) => {
-            if (index === i) {
-                return ({
-                    ...val,
-                    active: !val.active,
-                });
-            } else {
-                return val;
-            }
-        }))
+    const rowSelection: TableRowSelection<SubscriptionType> = {
+        onChange(selectedRowKeys) {
+            setSelectedKeys(selectedRowKeys);
+        },
+        selectedRowKeys,
     }
 
     const columns: ColumnsType<SubscriptionType> = [
@@ -68,21 +45,29 @@ const Home = () => {
         {
             title: "Active",
             render(_, record, index) {
-                return <Switch checked={record.active} onChange={() => handleChange(index)}/>
+                return <Switch checked={record.active} onChange={() => handleToggle(index)}/>
             }
         },
         {
             title: "",
-            render() {
-                return <Button size="small" type="primary" danger><DeleteOutlined/></Button>
+            render(_, record) {
+                return (
+                    <Space>
+                        <Link to={`/account/subscriptions/edit/${record.id}`}><Button type="primary" size="small"><EditOutlined/></Button></Link>
+                        <Button size="small" type="primary" danger><DeleteOutlined/></Button>
+                    </Space>
+                );
             }
         }
     ];
 
     return (
         <>
-            <Button style={{marginBottom: "16px"}} type="primary"><PlusOutlined/>Add New Event Subscription</Button>
-            <Table columns={columns} dataSource={data}/>
+            <Space style={{marginBottom: "16px"}}>
+                <Button type="primary"><PlusOutlined/>Add New Event Subscription</Button>
+                {selectedRowKeys.length > 0 && <Button type="primary" danger>{`Delete All (${selectedRowKeys.length})`}</Button>}
+            </Space>
+            <Table rowKey="id" columns={columns} rowSelection={rowSelection} dataSource={data}/>
         </>
     );
 }

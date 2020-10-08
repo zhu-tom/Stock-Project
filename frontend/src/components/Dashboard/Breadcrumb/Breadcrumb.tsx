@@ -19,6 +19,7 @@ const map: StringKeys = {
     '/deposit': 'Deposit',
     '/withdraw': 'Withdraw',
     '/create': 'Create',
+    '/edit': 'Edit',
 }
 
 const Crumb: React.FC<RouteComponentProps<{}> & {end?: string}> = ({location, end}) => {
@@ -29,9 +30,9 @@ const Crumb: React.FC<RouteComponentProps<{}> & {end?: string}> = ({location, en
             {parts.map((key, index) => {
                 return (
                     <Breadcrumb.Item>
-                        {(key === '/account' && <span>{map[key] || key.slice(1)}</span>) || (index === parts.length - 1 ? 
-                        <span>{end || map[key] || key.slice(1)}</span> : 
-                        (<Link to={parts.slice(0, index + 1).join('')}>{map[key] || key.slice(1)}</Link>))}
+                        {((key === '/account' && <span>{map[key] || key.slice(1)}</span>) || (index === parts.length - 1 ? 
+                        (end || map[key]) && <span>{end || map[key]}</span> : 
+                        (<Link to={parts.slice(0, index + 1).join('')}>{map[key]}</Link>)))}
                     </Breadcrumb.Item>
                 );
             })}

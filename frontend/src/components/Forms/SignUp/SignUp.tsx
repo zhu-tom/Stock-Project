@@ -2,14 +2,7 @@ import { Button, Card, Col, Form, Input, Row } from 'antd';
 import * as React from 'react';
 import Landing from '../../Landing/Landing';
 
-type State = {
-
-}
-
 class SignUp extends React.Component<{}, {}> {
-    state = {
-
-    }
 
     render() {
         return (
