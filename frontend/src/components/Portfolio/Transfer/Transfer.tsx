@@ -1,6 +1,7 @@
 import { Button, Card, Form, Input, Layout } from 'antd';
 import { useForm } from 'antd/lib/form/Form';
 import * as React from 'react';
+import Axios from 'axios';
 
 type Props = {
     type: "deposit" | "withdraw"
@@ -12,7 +13,13 @@ const Transfer: React.FC<Props> = ({type}) => {
     return (
         <Layout>
             <Card>
-                <Form form={form}>
+                <Form form={form} onFinish={(values) => {
+                    Axios.post(`/api/users/bbard1/${type}`, {
+                        amount: parseInt(values.amount)
+                    }).then(res => {
+                        console.log(res);
+                    });
+                }}>
                     <Form.Item name="amount" label={`${title} Amount`} 
                         rules={[
                             {
@@ -28,7 +35,7 @@ const Transfer: React.FC<Props> = ({type}) => {
                         <Input.Password/>
                     </Form.Item>
                     <Form.Item>
-                        <Button type="primary">{title}</Button>
+                        <Button type="primary" htmlType="submit">{title}</Button>
                     </Form.Item>
                 </Form>
             </Card>

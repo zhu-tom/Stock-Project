@@ -29,7 +29,7 @@ const Crumb: React.FC<RouteComponentProps<{}> & {end?: string}> = ({location, en
         <Breadcrumb style={{marginBottom: '16px'}} separator=">">
             {parts.map((key, index) => {
                 return (
-                    <Breadcrumb.Item>
+                    <Breadcrumb.Item key={index}>
                         {((key === '/account' && <span>{map[key] || key.slice(1)}</span>) || (index === parts.length - 1 ? 
                         (end || map[key]) && <span>{end || map[key]}</span> : 
                         (<Link to={parts.slice(0, index + 1).join('')}>{map[key]}</Link>)))}

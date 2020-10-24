@@ -1,10 +1,53 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Col, Input, Layout, Menu, Row } from 'antd';
+import { AutoComplete, Avatar, Badge, Col, Input, Layout, Menu, Row, Typography } from 'antd';
 import * as React from 'react';
+import _ from 'lodash';
+import Axios from 'axios';
+import { useHistory } from 'react-router-dom';
+import { StockType } from '../../../types/StockTypes';
+import { SelectProps } from 'antd/lib/select';
 
 const data: string[] = ["Notification 1", "Notification 2","Notification 3"];
 
 const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> = ({siderCollapsed, setSiderCollapsed}) => {
+    const [results, setResults] = React.useState<StockType[]>([]);
+    const [loading, setLoading] = React.useState(false);
+    const history = useHistory();
+    const [search, setSearch] = React.useState("");
+
+    const handleSearch = _.debounce((value: string) => {
+        doSearch(value);
+    }, 500);
+
+    const doSearch = (value: string) => {
+        setSearch(value);
+        Axios.get(`/api/stocks?q=${value}`).then(res => {
+            setResults(res.data);
+        });
+    }
+
+    const handleSubmit = (value: string) => {
+        setLoading(true);
+        Axios.get(`/api/stocks?q=${value}`)
+            .then(res => {
+                history.push(`/market/${res.data[0].symbol}`);
+            })
+            .finally(() => setLoading(false));
+    }
+
+    const options: SelectProps<object>['options'] = results.map(res => {
+        return (
+            {
+                value: res.symbol,
+                label: (
+                    <Typography.Text ellipsis>
+                        {`${res.symbol} - ${res.name}`}
+                    </Typography.Text>
+                )
+            }
+        )
+    });
+
     return (
         <Layout.Header style={{background: '#fff', padding:0}}>
             <Row>
@@ -13,7 +56,9 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
                         onClick: () => setSiderCollapsed(!siderCollapsed),
                         style: {fontSize: '16pt', padding: '16px', height: '100%', display: 'flex', alignItems:'center'}
                     })}    
-                    <Input.Search placeholder="Search..." enterButton/>
+                    <AutoComplete onSelect={handleSubmit} onSearch={doSearch} onChange={handleSearch} options={options}>
+                        <Input.Search placeholder="Search..." enterButton loading={loading} value={search}/>
+                    </AutoComplete>                    
                 </Col>
                 <Col flex='auto'>
                     <Menu style={{float:'right'}} theme="light" mode="horizontal">

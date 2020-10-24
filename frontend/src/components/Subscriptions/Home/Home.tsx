@@ -5,10 +5,9 @@ import { TableRowSelection } from "antd/lib/table/interface";
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { SubscriptionType } from "../../../types/StockTypes";
+import Axios from 'axios';
 
-const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: number) => void}> = ({subscriptions, handleToggle}) => {
-    const data = subscriptions;
-
+const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: number, id: number | string) => void, setSubscriptions: any}> = ({subscriptions, handleToggle, setSubscriptions}) => {
     const [selectedRowKeys, setSelectedKeys]: [React.Key[], any] = React.useState([]);
 
     const rowSelection: TableRowSelection<SubscriptionType> = {
@@ -21,7 +20,9 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
     const columns: ColumnsType<SubscriptionType> = [
         {
             title: "Symbol",
-            dataIndex: "symbol",
+            render(val) {
+                return <Link to={`/market/${val.symbol}`}>{val.symbol}</Link>;
+            },
             sorter(a, b) {
                 return a.symbol < b.symbol ? -1 : 1;
             }
@@ -36,16 +37,19 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
         {
             title: "Constraints",
             render(val) {
-                return `${val.minChange}%`;
+                return `${val.event}%`;
             },
             sorter(a, b) {
-                return a.minChange - b.minChange;
+                return a.event - b.event;
             }
         },
         {
             title: "Active",
             render(_, record, index) {
-                return <Switch checked={record.active} onChange={() => handleToggle(index)}/>
+                return <Switch checked={record.active} onChange={() => {
+                        handleToggle(index, record.id)
+                    }
+                }/>
             }
         },
         {
@@ -54,7 +58,12 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
                 return (
                     <Space>
                         <Link to={`/account/subscriptions/edit/${record.id}`}><Button type="primary" size="small"><EditOutlined/></Button></Link>
-                        <Button size="small" type="primary" danger><DeleteOutlined/></Button>
+                        <Button size="small" type="primary" danger onClick={() => {
+                            Axios.delete(`/api/users/bbard1/subscriptions/${record.id}`).then(res => {
+                                let copy = [...subscriptions];
+                                setSubscriptions(copy.filter(item => item.id !== record.id));
+                            });
+                        }}><DeleteOutlined/></Button>
                     </Space>
                 );
             }
@@ -67,7 +76,7 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
                 <Button type="primary"><PlusOutlined/>Add New Event Subscription</Button>
                 {selectedRowKeys.length > 0 && <Button type="primary" danger>{`Delete All (${selectedRowKeys.length})`}</Button>}
             </Space>
-            <Table rowKey="id" columns={columns} rowSelection={rowSelection} dataSource={data}/>
+            <Table rowKey="id" columns={columns} rowSelection={rowSelection} dataSource={subscriptions}/>
         </>
     );
 }

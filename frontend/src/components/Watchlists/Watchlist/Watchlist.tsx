@@ -2,15 +2,17 @@ import { Button, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import {StockType, WatchlistType} from '../../../types/StockTypes';
 import Breadcrumb from '../../Dashboard/Breadcrumb/Breadcrumb';
+import Axios from 'axios';
 
 type Props = {
     watchlists?: WatchlistType[],
+    setWatchlists: any,
 }
 
-const Watchlist: React.FC<Props> = ({watchlists}) => {
+const Watchlist: React.FC<Props> = ({watchlists, setWatchlists}) => {
     const [selectedRowKeys, setSelectedKeys]: [React.Key[], any] = React.useState([]);
 
     const { id } = useParams<{id: string}>();
@@ -19,7 +21,9 @@ const Watchlist: React.FC<Props> = ({watchlists}) => {
     const columns: ColumnsType<StockType> = [
         {
             title: "Symbol",
-            dataIndex: "symbol",
+            render(val) {
+                return <Link to={`/market/${val.symbol}`}>{val.symbol}</Link>;
+            },
             sorter(a, b) {
                 return a.symbol < b.symbol ? -1:1;
             }
@@ -39,23 +43,33 @@ const Watchlist: React.FC<Props> = ({watchlists}) => {
             }
         }, 
         {
-            title: "Ask",
-            dataIndex: "ask",
+            title: "Ask/Bid",
+            render({current}) {
+                return `${current.ask}/${current.bid}`
+            },
             sorter(a, b) {
-                return a.ask - b.ask;
+                return a.current.ask - b.current.ask;
             }
         },
         {
             title: "Daily Trades",
-            dataIndex: "daily",
+            render({daily}) {
+                return daily.trades;
+            },
             sorter(a, b) {
-                return a.daily - b.daily;
+                return a.daily.trades - b.daily.trades;
             }
         }, 
         {
             title: "",
-            render() {
-                return <Button danger>Remove</Button>
+            render(item, _, stockIndex) {
+                return <Button danger onClick={() => {
+                    
+                    Axios.delete(`/api/users/bbard1/watchlists/${id}/symbol/${item.symbol}`).then((data) => {
+                        console.log(data.data);
+                        setWatchlists(data.data);
+                    })
+                }}>Remove</Button>
             }
         }
     ];

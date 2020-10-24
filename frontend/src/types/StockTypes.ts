@@ -4,12 +4,24 @@ export type StockType = {
     name: string,
     symbol: string,
     price: number,
-    ask: number,
-    daily: number,
-    high?: number,
-    low?: number,
-    historical?: number[],
+    daily: {
+        high: number,
+        low: number,
+        trades: number,
+    },
+    current: {
+        ask: number,
+        bid: number,
+    },
+    history: StockDataType[],
 }
+
+export type StockDataType = { 
+    datetime?: string, 
+    date?:string,
+    value?:number, 
+    price?: number 
+};
 
 export type WatchlistType = {
     id: number,
@@ -19,14 +31,22 @@ export type WatchlistType = {
 
 export type OwnedStockType = Omit<StockType, 'ask'|'daily'> & {
     amount: number,
-    avgPaid: number,
+    avgPrice: number,
+}
+
+export type PortfolioType = {
+    username: string,
+    name: string,
+    portfolio: OwnedStockType[],
+    data: StockDataType[],
+    cash: number,
 }
 
 export type SubscriptionType = {
     id: number,
     name: string,
     symbol: string,
-    minChange: number,
+    event: number,
     active: boolean,
 }
 
@@ -35,10 +55,10 @@ export type OrderType = {
     symbol: string,
     name?: string,
     type: 'buy' | 'sell',
-    placed: number,
+    amount: number,
     fulfilled: number,
     price: number,
-    date: moment.Moment,
+    datetime: string,
 }
 
 export type TradeType = {
@@ -46,13 +66,13 @@ export type TradeType = {
     type: 'buy' | 'sell',
     amount: number,
     symbol: string,
-    date: moment.Moment,
-    price: number,
+    datetime: string,
+    price?: number,
 }
 
 export type TransferType = {
     id: number,
     type: 'withdraw' | 'deposit',
     amount: number,
-    date: moment.Moment
+    datetime: string
 }

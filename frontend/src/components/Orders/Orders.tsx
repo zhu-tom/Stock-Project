@@ -5,36 +5,20 @@ import * as React from 'react';
 import { OrderType } from '../../types/StockTypes';
 import Breadcrumb from '../Dashboard/Breadcrumb/Breadcrumb';
 import moment from 'moment';
-
-const ordrers: OrderType[] = [
-    {
-        id: 329,
-        symbol: "MSFT",
-        name: "Microsoft",
-        type: 'buy',
-        placed: 23,
-        fulfilled: 20,
-        price: 56,
-        date: moment("09-24-20 09:20:30")
-    },
-    {
-        id: 239,
-        symbol: "APPL",
-        name: "Apple",
-        type: 'sell',
-        placed: 43,
-        fulfilled: 24,
-        price: 234,
-        date: moment("10-04-20 12:32:45")
-    }
-];
+import Axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Orders = () => {
     const [selectedRowKeys, setSelectedKeys]: [React.Key[], any] = React.useState([]);
+    const [data, setData] = React.useState<OrderType[]>([]);
+
+    Axios.get("/api/users/bbard1/orders").then(res => {
+        setData(res.data);
+    });
 
     const rowSelection: TableRowSelection<OrderType> = {
-        onChange(selectedRowKeys) {
-            setSelectedKeys(selectedRowKeys);
+        onChange(keys) {
+            setSelectedKeys(keys);
         },
         selectedRowKeys,
     }
@@ -43,7 +27,7 @@ const Orders = () => {
         {
             title: "Symbol",
             render(val) {
-                return `${val.symbol} (${val.name})`;
+                return (<Link to={`/market/${val.symbol}`}>{val.symbol}</Link>);
             },
             sorter(a, b) {
                 return a.symbol > b.symbol ? 1 : -1;
@@ -86,19 +70,19 @@ const Orders = () => {
             }
         },
         {
-            title: "Placed",
-            dataIndex: 'placed',
+            title: "Amount",
+            dataIndex: 'Amount',
             sorter(a, b) {
-                return a.placed - b.placed;
+                return a.amount - b.amount;
             }
         },
         {
             title: "Date",
             render(_, record) {
-                return record.date.format("ddd MMM Do h:mm a");
+                return moment(record.datetime).format("ddd MMM Do h:mm a");
             },
             sorter(a, b) {
-                return a.date.isAfter(b.date) ? 1 : -1;
+                return moment(a.datetime).isAfter(moment(b.datetime)) ? 1 : -1;
             }
         },
         {
@@ -113,7 +97,7 @@ const Orders = () => {
         <>
             <Breadcrumb/>
             {selectedRowKeys.length > 0 && <Button style={{marginBottom: '16px'}} type="primary" danger>{`Cancel All (${selectedRowKeys.length})`}</Button>}
-            <Table rowKey="id" rowSelection={rowSelection} dataSource={ordrers} columns={columns}/>
+            <Table rowKey="id" rowSelection={rowSelection} dataSource={data} columns={columns}/>
         </>
     );
 }

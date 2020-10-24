@@ -4,45 +4,25 @@ import moment from 'moment';
 import { TradeType, TransferType } from '../../types/StockTypes';
 import Breadcrumb from '../Dashboard/Breadcrumb/Breadcrumb';
 import { ColumnsType } from 'antd/lib/table';
-
-const data: (TransferType | TradeType)[] = [
-    {
-        id: 2193,
-        type: 'buy',
-        amount: 3210,
-        symbol: "MSFT",
-        price: 10,
-        date: moment("10-02-20 14:59:20")
-    },
-    {
-        id: 2345,
-        type: 'sell',
-        amount: 693,
-        symbol: "APPL",
-        price: 902,
-        date: moment("10-01-20 16:32:12")
-    },
-    {
-        id: 312,
-        type: 'withdraw',
-        amount: 932,
-        date: moment("09-26-20 11:29:31")
-    },
-    {
-        id: 312,
-        type: 'deposit',
-        amount: 2453,
-        date: moment("09-24-20 11:29:31")
-    },
-];
+import Axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const History = () => {
+    const [data, setData] = React.useState<(TransferType | TradeType)[]>([]);
+
+    React.useEffect(() => {
+        Axios.get("/api/users/bbard1/history").then(res => {
+            setData(res.data);
+        });
+    })
     const columns: ColumnsType<TransferType | TradeType> = [
         {
             title: "Action",
             render(item) {
-                return `${item.type.charAt(0).toUpperCase().concat(item.type.slice(1))} ${item.amount} 
-                    ${(item.type === "buy" || item.type === "sell") ? `${item.symbol} at ${item.price}`:""}`;
+                return <>
+                    {`${item.type.charAt(0).toUpperCase().concat(item.type.slice(1))} ${item.amount} `}
+                    {(item.type === "buy" || item.type === "sell") ? <><Link to={`/market/${item.symbol}`}>{item.symbol}</Link>{` at ${item.price}`}</>:""}
+                </>
             },
             sorter(a, b) {
                 return a.type > b.type ? 1 : -1;
@@ -72,10 +52,10 @@ const History = () => {
         {
             title: "Date",
             render(item) {
-                return item.date.format("dddd, MMMM Do YYYY, h:mm:ss a");
+                return moment(item.datetime).format("dddd, MMMM Do YYYY, h:mm:ss a");
             },
             sorter(a, b) {
-                return a.date.isBefore(b.date) ? -1 : 1;
+                return moment(a.datetime).isBefore(moment(b.datetime)) ? -1 : 1;
             }
         }
     ]
