@@ -1,5 +1,4 @@
 const express = require('express');
-const { userInfo } = require('os');
 
 const router = express.Router();
 
