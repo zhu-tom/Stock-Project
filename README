@@ -1,0 +1,13 @@
+Project Name: Stock Broker Project
+Individual: Tom Zhu 101145916 (Solo)
+
+Extensions:
+- Used React Typescript for frontend
+- Support for multiple screen sizes and interfaces (desktop and mobile-friendly)
+- Fully integrated MongoDB into application
+
+Design Decisions:
+- Separated frontend components into separate or nested folders, grouping them based on functionality and relationships
+- Use of Ant Design as a frontend component library significantly improves user experience and makes it easier to develop large scale enterprise applications 
+- Develop frontend routing using React Router to allow for more modular design as parts can be separated better when the Switch Router is used 
+- 

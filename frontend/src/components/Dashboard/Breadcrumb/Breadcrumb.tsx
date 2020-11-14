@@ -24,7 +24,6 @@ const map: StringKeys = {
 
 const Crumb: React.FC<RouteComponentProps<{}> & {end?: string}> = ({location, end}) => {
     const parts = location.pathname.split(/(?=\/)/);
-    console.log(parts);
     return (
         <Breadcrumb style={{marginBottom: '16px'}} separator=">">
             {parts.map((key, index) => {

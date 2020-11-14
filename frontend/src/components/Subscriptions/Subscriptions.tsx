@@ -12,7 +12,7 @@ const Subscriptions = () => {
     const [subscriptions, setSubscriptions] = React.useState<SubscriptionType[]>([]);
 
     React.useEffect(() => {
-        Axios.get("/api/users/bbard1/subscriptions").then(data => {
+        Axios.get("/api/me/subscriptions").then(data => {
             setSubscriptions(data.data);
         }).catch(err => {
             console.log(err);
@@ -21,7 +21,7 @@ const Subscriptions = () => {
 
     const handleToggle = _.throttle((i: number, id: number | string) => {
         setSubscriptions(subscriptions.map((val, index) => {
-            Axios.post(`/api/users/bbard1/subscriptions/${id}/toggle`).then((data) => {
+            Axios.post(`/api/me/subscriptions/${id}/toggle`).then((data) => {
                 console.log(data);
             });
             if (index === i) {

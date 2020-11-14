@@ -12,20 +12,21 @@ const Stock = () => {
 
     const [ isOrder, setOrder ] = React.useState<boolean>();
     const [ isList, setList ] = React.useState(false);
+    const [ isSub, setSub ] = React.useState(false);
+
     const [ stock, setStock ] = React.useState<StockType | undefined>(undefined);
     const [ portfolio, setPortfolio ] = React.useState<OwnedStockType>();
     const [ watchlists, setWatchlists ] = React.useState<WatchlistType[]>([]);
 
     const [watchlistForm] = Form.useForm();
-
-    console.log(symbol);
+    const [subForm] = Form.useForm();
+    const [orderForm] = Form.useForm();
 
     React.useEffect(() => {
         Axios.get(`/api/stocks/symbol/${symbol}`).then(res => {
-            console.log(res);
             setStock(res.data);
         });
-        Axios.get(`/api/users/bbard1/portfolio?stock=${symbol}`).then(res => {
+        Axios.get(`/api/me/portfolio?stock=${symbol}`).then(res => {
             setPortfolio(res.data);
         }).catch(() => {
             console.log("not found");
@@ -39,12 +40,13 @@ const Stock = () => {
                 <PageHeader title={symbol} extra={[
                     <Button type="primary" onClick={() => setOrder(true)}>New Order</Button>,
                     <Button type="primary" onClick={() => {
-                        Axios.get("/api/users/bbard1/watchlists").then(res => {
+                        Axios.get("/api/me/watchlists").then(res => {
+                            console.log(res.data);
                             setWatchlists(res.data);
                         });
                         setList(true);
                     }}><EyeOutlined/>Watchlist</Button>,
-                    <Button><NotificationOutlined/>Subscriptions</Button>
+                    <Button onClick={() => setSub(true)}><NotificationOutlined/>Subscriptions</Button>
                 ]}>
                     <Descriptions bordered layout="vertical" size="middle">
                         <Descriptions.Item label="Name">{stock?.name}</Descriptions.Item>
@@ -81,24 +83,30 @@ const Stock = () => {
                     </Tabs.TabPane>
                 </Tabs>
             </Card>
-            <Modal visible={isOrder} title="New Order" onCancel={() => setOrder(false)} onOk={() => setOrder(false)}>
-                <Form>
-                    <Form.Item required label="Symbol">
-                        <Input disabled value={symbol}/>
+            <Modal visible={isOrder} title="New Order" onCancel={() => setOrder(false)} onOk={() => orderForm.submit()}>
+                <Form onFinish={values => {
+                    const {amount, price, type} = values;
+                    Axios.post(`/api/stocks/symbol/${symbol}/${type}`, {amount, price}).then(res => {
+                        console.log(res.data);
+                        setOrder(false);
+                    });
+                }} form={orderForm} preserve={false}>
+                    <Form.Item required name="symbol" initialValue={symbol} label="Symbol">
+                        <Input disabled/>
                     </Form.Item>
-                    <Form.Item required label="Amount">
+                    <Form.Item required name="amount" label="Amount">
                         <InputNumber min={0}/>
                     </Form.Item>
-                    <Form.Item required label="Price">
+                    <Form.Item required name="price" label="Price">
                         <InputNumber min={0}/>
                     </Form.Item>
-                    <Form.Item required label="Type">
+                    <Form.Item required name="type" label="Type">
                         <Radio.Group>
                             <Radio value="buy">Buy</Radio>
                             <Radio value="sell">Sell</Radio>
                         </Radio.Group>
                     </Form.Item>
-                    <Form.Item required label="Expiry">
+                    <Form.Item required name="expiry" label="Expiry">
                         <Select>
                             <Select.Option value="nolimit">Until Cancelled</Select.Option>
                             <Select.Option value="endday">End of Day</Select.Option>
@@ -116,21 +124,40 @@ const Stock = () => {
                             listIds.push(key);
                         }
                     }
-                    Axios.post(`/api/users/bbard1/watchlists/addStock`, {
-                        symbol: symbol,
+                    Axios.post(`/api/me/watchlists/addStock`, {
+                        id: stock?._id,
                         lists: listIds,
                     }).then(res => {
                         console.log(res.data)
                     }).finally(() => setList(false));
                 }} form={watchlistForm} preserve={false}>
                    {watchlists.map(list => {
-                       console.log(!!list.stocks.find(item => item.symbol === symbol));
                        return (
-                           <Form.Item initialValue={!!list.stocks.find(item => item.symbol === symbol)} name={list.id} valuePropName="checked">
+                           <Form.Item initialValue={!!list.stocks.find(item => item.symbol === symbol)} name={list._id} valuePropName="checked">
                                <Checkbox>{list.name}</Checkbox>
                            </Form.Item>
                        );
                    })}
+                </Form>
+            </Modal>
+            <Modal visible={isSub} title="Add Event Subscription" onCancel={() => setSub(false)} onOk={() => {
+                subForm.submit();
+            }}>
+                <Form onFinish={({event}) => {
+                    Axios.post("/api/me/subscriptions", {
+                        symbol,
+                        event,
+                    }).then(res => {
+                        console.log(res.data);
+                        setSub(false);
+                    });
+                }} form={subForm} preserve={false}>
+                    <Form.Item required label="Symbol">
+                        <Input disabled value={symbol}/>
+                    </Form.Item>
+                    <Form.Item required name="event" label="Min. Change">
+                        <InputNumber formatter={val => `${val}%`} parser={val => val!.replace("%", '')} min={0}/>
+                    </Form.Item>
                 </Form>
             </Modal>
         </>

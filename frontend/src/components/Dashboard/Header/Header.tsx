@@ -21,18 +21,19 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
 
     const doSearch = (value: string) => {
         setSearch(value);
-        Axios.get(`/api/stocks?q=${value}`).then(res => {
-            setResults(res.data);
-        });
+        if (value) {
+            Axios.get(`/api/stocks?q=${value}`).then(res => {
+                setResults(res.data);
+            });
+        }
     }
 
     const handleSubmit = (value: string) => {
         setLoading(true);
-        Axios.get(`/api/stocks?q=${value}`)
-            .then(res => {
-                history.push(`/market/${res.data[0].symbol}`);
-            })
-            .finally(() => setLoading(false));
+        if (value) {
+            history.push(`/market/${value}`);
+        }
+        setLoading(false);
     }
 
     const options: SelectProps<object>['options'] = results.map(res => {

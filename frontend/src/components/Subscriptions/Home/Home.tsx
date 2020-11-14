@@ -47,7 +47,7 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
             title: "Active",
             render(_, record, index) {
                 return <Switch checked={record.active} onChange={() => {
-                        handleToggle(index, record.id)
+                        handleToggle(index, record._id)
                     }
                 }/>
             }
@@ -57,11 +57,11 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
             render(_, record) {
                 return (
                     <Space>
-                        <Link to={`/account/subscriptions/edit/${record.id}`}><Button type="primary" size="small"><EditOutlined/></Button></Link>
+                        <Link to={`/account/subscriptions/edit/${record._id}`}><Button type="primary" size="small"><EditOutlined/></Button></Link>
                         <Button size="small" type="primary" danger onClick={() => {
-                            Axios.delete(`/api/users/bbard1/subscriptions/${record.id}`).then(res => {
+                            Axios.delete(`/api/me/subscriptions/${record._id}`).then(res => {
                                 let copy = [...subscriptions];
-                                setSubscriptions(copy.filter(item => item.id !== record.id));
+                                setSubscriptions(copy.filter(item => item._id !== record._id));
                             });
                         }}><DeleteOutlined/></Button>
                     </Space>

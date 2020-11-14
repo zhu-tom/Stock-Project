@@ -22,7 +22,7 @@ const Home: React.FC<Props> = ({watchlists, setWatchlists}) => {
         {
             title: "Name",
             render(val: WatchlistType) {
-                return <Link to={`${path}/${val.id}`}>{val.name}</Link>
+                return <Link to={`${path}/${val._id}`}>{val.name}</Link>
             }
         },
         {
@@ -33,8 +33,13 @@ const Home: React.FC<Props> = ({watchlists, setWatchlists}) => {
         },
         {
             title: "",
-            render() {
-                return <Button danger size="small" type="primary"><DeleteOutlined/></Button>
+            render(val: WatchlistType) {
+                return <Button danger size="small" type="primary" 
+                        onClick={() => {
+                            Axios.delete(`/api/me/watchlists/${val._id}`).then(res => {
+                                setWatchlists(res.data);
+                            })
+                        }}><DeleteOutlined/></Button>
             }
         }
     ];
@@ -47,8 +52,8 @@ const Home: React.FC<Props> = ({watchlists, setWatchlists}) => {
     }
 
     const handleOk = () => {
-        Axios.post("/api/users/bbard1/watchlists", {name: watchlistName}).then(res => {
-            setWatchlists(watchlists?.concat([res.data]));
+        Axios.post("/api/me/watchlists", {name: watchlistName}).then(res => {
+            setWatchlists(res.data);
         })
         setIsVisible(false);
         setWatchlistName("");

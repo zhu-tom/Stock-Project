@@ -11,7 +11,7 @@ const History = () => {
     const [data, setData] = React.useState<(TransferType | TradeType)[]>([]);
 
     React.useEffect(() => {
-        Axios.get("/api/users/bbard1/history").then(res => {
+        Axios.get("/api/me/history").then(res => {
             setData(res.data);
         });
     })

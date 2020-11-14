@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Dashboard from './components/Dashboard/Dashboard';
+import Login from './components/Forms/LogIn/LogIn';
 import SignUp from './components/Forms/SignUp/SignUp';
 import History from './components/History/History';
 import Home from './components/Home/Home';
@@ -21,7 +22,7 @@ function App() {
         <SignUp/>
       </Route>
       <Route path="/login">
-
+        <Login/>
       </Route>
       <Route path="/">
         <Dashboard>

@@ -12,7 +12,7 @@ const Orders = () => {
     const [selectedRowKeys, setSelectedKeys]: [React.Key[], any] = React.useState([]);
     const [data, setData] = React.useState<OrderType[]>([]);
 
-    Axios.get("/api/users/bbard1/orders").then(res => {
+    Axios.get("/api/me/orders").then(res => {
         setData(res.data);
     });
 

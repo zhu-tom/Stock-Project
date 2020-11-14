@@ -14,7 +14,7 @@ const Transfer: React.FC<Props> = ({type}) => {
         <Layout>
             <Card>
                 <Form form={form} onFinish={(values) => {
-                    Axios.post(`/api/users/bbard1/${type}`, {
+                    Axios.post(`/api/me/${type}`, {
                         amount: parseInt(values.amount)
                     }).then(res => {
                         console.log(res);

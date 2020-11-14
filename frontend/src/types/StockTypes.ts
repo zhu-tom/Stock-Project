@@ -1,6 +1,5 @@
-import moment from 'moment';
-
 export type StockType = {
+    _id: string,
     name: string,
     symbol: string,
     price: number,
@@ -24,7 +23,7 @@ export type StockDataType = {
 };
 
 export type WatchlistType = {
-    id: number,
+    _id: string,
     name: string,
     stocks: StockType[]
 }
@@ -43,7 +42,7 @@ export type PortfolioType = {
 }
 
 export type SubscriptionType = {
-    id: number,
+    _id: string,
     name: string,
     symbol: string,
     event: number,
@@ -51,7 +50,7 @@ export type SubscriptionType = {
 }
 
 export type OrderType = {
-    id: number,
+    _id: string,
     symbol: string,
     name?: string,
     type: 'buy' | 'sell',
@@ -62,7 +61,7 @@ export type OrderType = {
 }
 
 export type TradeType = {
-    id: number,
+    _id: string,
     type: 'buy' | 'sell',
     amount: number,
     symbol: string,
@@ -71,7 +70,7 @@ export type TradeType = {
 }
 
 export type TransferType = {
-    id: number,
+    _id: string,
     type: 'withdraw' | 'deposit',
     amount: number,
     datetime: string

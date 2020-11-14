@@ -8,40 +8,45 @@ const store = new MongoDBStore({
 });
 const express = require("express");
 const stocksRouter = require('./routes/stocks-router');
-const userRouter = require('./routes/user-router');
+const {router: userRouter} = require('./routes/user-router');
+const meRouter = require('./routes/me-router');
+const authRouter = require('./routes/auth-router');
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(session({
     secret: 'secret',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true },
-    store
 }));
 app.use(express.static(path.join(__dirname, "../frontend/build")));
  
 const apiRouter = express.Router();
 
 apiRouter.get('/ping', (req, res) => {
-    console.log(req.session.loggedin);
+    req.session.loggedin = true;
+    req.session.username = 'admin';
+    req.session.type = 'admin';
     res.send(JSON.stringify({message: req.session.loggedin}));
 });
 
 apiRouter.use("/stocks", stocksRouter);
 apiRouter.use("/users", userRouter);
+apiRouter.use("/me", meRouter);
 
 app.use('/api', apiRouter);
 
-app.get("/login", (req, res) => {
-    console.log(req.session.loggedin);
-    req.session.loggedin = true;
-    res.sendStatus(200);
-});
+app.use('/auth', authRouter);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "build/index.html"));
+});
+
+mongoose.connect("mongodb://localhost/stockbroker", {useNewUrlParser: true, useUnifiedTopology: true});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once("open", () => {
+    console.log("Connected to mongodb");
 });
 
 app.listen(8080, () => {

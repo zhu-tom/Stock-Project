@@ -14,7 +14,7 @@ const Home: React.FC<{}> = () => {
     const [stockTotal, setStockTotal] = React.useState<number>(0);
 
     React.useEffect(() => {
-        Axios.get("/api/users/bbard1/portfolio").then(res => {
+        Axios.get("/api/me/portfolio").then(res => {
             const newTotal = res.data.portfolio.reduce((prev: number, curr: OwnedStockType) => prev + (curr.amount * curr.price), 0);
             res.data.data.push({datetime: new Date().toISOString(), value: newTotal + res.data.cash});
             setData(res.data);

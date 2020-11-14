@@ -16,7 +16,7 @@ const Watchlist: React.FC<Props> = ({watchlists, setWatchlists}) => {
     const [selectedRowKeys, setSelectedKeys]: [React.Key[], any] = React.useState([]);
 
     const { id } = useParams<{id: string}>();
-    const list = watchlists?.find(val => val.id === parseInt(id));
+    const list = watchlists?.find(val => val._id === id);
     
     const columns: ColumnsType<StockType> = [
         {
@@ -65,7 +65,7 @@ const Watchlist: React.FC<Props> = ({watchlists, setWatchlists}) => {
             render(item, _, stockIndex) {
                 return <Button danger onClick={() => {
                     
-                    Axios.delete(`/api/users/bbard1/watchlists/${id}/symbol/${item.symbol}`).then((data) => {
+                    Axios.delete(`/api/me/watchlists/${id}/symbol/${item._id}`).then((data) => {
                         console.log(data.data);
                         setWatchlists(data.data);
                     })

@@ -11,7 +11,8 @@ const Watchlists = () => {
     const [ watchlists, setWatchlists ] = React.useState<WatchlistType[] | undefined>(undefined);
 
     React.useEffect(() => {
-        Axios.get("/api/users/bbard1/watchlists").then(res => {
+        Axios.get("/api/me/watchlists").then(res => {
+            console.log(res.data);
             setWatchlists(res.data);
         });
     }, []);
