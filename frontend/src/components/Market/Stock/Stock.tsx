@@ -86,7 +86,7 @@ const Stock = () => {
             <Modal visible={isOrder} title="New Order" onCancel={() => setOrder(false)} onOk={() => orderForm.submit()}>
                 <Form onFinish={values => {
                     const {amount, price, type} = values;
-                    Axios.post(`/api/stocks/symbol/${symbol}/${type}`, {amount, price}).then(res => {
+                    Axios.post(`/api/stocks/symbol/${symbol}/orders`, {amount, price, type}).then(res => {
                         console.log(res.data);
                         setOrder(false);
                     });
@@ -124,7 +124,7 @@ const Stock = () => {
                             listIds.push(key);
                         }
                     }
-                    Axios.post(`/api/me/watchlists/addStock`, {
+                    Axios.put(`/api/me/watchlists`, {
                         id: stock?._id,
                         lists: listIds,
                     }).then(res => {

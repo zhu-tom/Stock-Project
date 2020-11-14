@@ -21,7 +21,7 @@ const Subscriptions = () => {
 
     const handleToggle = _.throttle((i: number, id: number | string) => {
         setSubscriptions(subscriptions.map((val, index) => {
-            Axios.post(`/api/me/subscriptions/${id}/toggle`).then((data) => {
+            Axios.post(`/api/me/subscriptions/${id}/active`).then((data) => {
                 console.log(data);
             });
             if (index === i) {

@@ -73,7 +73,7 @@ watchlistRouter.post("/", (req, res, next) => {
     }
 }, getWatchlists);
 
-watchlistRouter.post("/addStock", (req, res) => {
+watchlistRouter.put("/", (req, res) => {
     const { lists, id } = req.body;
     if (lists && id) {
         req.user.findWatchlists().where("_id").in(lists).exec((err, docs) => {

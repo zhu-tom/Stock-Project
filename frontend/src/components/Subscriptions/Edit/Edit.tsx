@@ -9,15 +9,16 @@ const Edit: React.FC<{subscriptions: SubscriptionType[], setSubscriptions: any}>
     const history = useHistory();
     const [item, setItem] = React.useState<SubscriptionType>();
 
+    const [form] = Form.useForm();
+
     React.useEffect(() => {
         Axios.get(`/api/me/subscriptions/${id}`).then(res => {
             console.log(res.data);
             setItem(res.data);
             form.setFieldsValue(res.data);
         });
-    }, [id]);
+    }, [id, form]);
 
-    const [form] = Form.useForm();
 
     const [loading, setLoading] = React.useState(false);
     return (

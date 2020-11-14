@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -13,9 +13,6 @@ import Subscriptions from './components/Subscriptions/Subscriptions';
 import Watchlists from './components/Watchlists/Watchlists';
 
 function App() {
-  useEffect(() => {
-    fetch('/api/ping').then((res) => res.json()).then(res => console.log(res));
-  }, []);
   return (
     <Switch>
       <Route path="/signup">

@@ -33,7 +33,7 @@ subscriptionsRouter.get("/:id", (req, res) => {
     res.status(200).send(req.sub);
 })
 
-subscriptionsRouter.post("/:id/toggle", (req, res) => {
+subscriptionsRouter.post("/:id/active", (req, res) => {
     req.sub.active = !req.sub.active;
     req.sub.save((err, doc) => {
         if (err) {

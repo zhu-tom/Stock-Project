@@ -10,4 +10,44 @@ Design Decisions:
 - Separated frontend components into separate or nested folders, grouping them based on functionality and relationships
 - Use of Ant Design as a frontend component library significantly improves user experience and makes it easier to develop large scale enterprise applications 
 - Develop frontend routing using React Router to allow for more modular design as parts can be separated better when the Switch Router is used 
-- 
+- Backend is separated into several folders, including models, routes, server, and generator folders
+- Adhered to REST principles closely
+    - Separated client and server and keep entities separated, with their only communication through http requests 
+    - Both only aware of API while implementation is kept to high level
+    - Main business logic is kept on server while there is simple validation on client, facilitates MVC paradigm
+    - Each request in the API is independent, do not rely on each other, rather go through significant parsing and vary through parameters
+    - Strong naming conventions for routes in both frontend and backend, good use of various http methods, such as POST, GET, PUT, DELETE have a uniform interface for simple and consistent routing
+    - Client routes are named so they branch off whenever possible, to show relationships between pages
+    - Used request query, body, parameters, to specify and combine strong queries 
+    - Specified correct response codes on all possible success and errors to indicate for frontend what type of error there may be 
+    - Developed a layered system so only backend interacts with database, frontend only interacts with backend, etc 
+    - Used middleware chaining, for example to parse url parameters, query parameters, and add the data to the request to keep API simple and reusable
+- Used asynchronous operations in both frontend and backend using Axios and MongoDB, chained promises in backend whenever possible 
+- Added password hashing and authorization for added security (not storing in plain-text)
+
+OpenStack Information: 
+IP: 134.117.128.24
+User: student
+Pass: LotrIsGr8!
+
+Instructions: 
+1. Connect to Carleton VPN
+2. Go to terminal
+3. Enter the command: ssh student@134.117.128.24
+4. Enter my password: LotrIsGr8!
+5. Enter the command: cd ~/Stock-Project/backend
+6. Enter command: npm install
+7. Enter command: cd generators
+8. Enter command: node stocks-generator.js
+9. Kill the process with ctrl+C when you see "Done populating collections"
+10. Command: cd ../../frontend
+11. Command: npm install
+12. Command: npm run build (this may take a while)
+13. Command: cd ../backend
+14. Command: node server.js
+15. While the server is running, open another terminal
+16. Command: ssh -L 9999:localhost:8080 student@134.117.128.24
+17. Enter my password: LotrIsGr8!
+18. Open http://localhost:9999 on your machine
+
+If something goes wrong, try "git pull origin" and restarting the instructions from step 5.
