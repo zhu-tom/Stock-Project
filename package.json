@@ -1,0 +1,21 @@
+{
+  "name": "stock-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "cd frontend && npm install && npm run build && cd ..",
+    "start": "cd backend && npm i && node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhu-tom/Stock-Project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhu-tom/Stock-Project/issues"
+  },
+  "homepage": "https://github.com/zhu-tom/Stock-Project#readme"
+}
