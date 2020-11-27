@@ -41,7 +41,9 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "build/index.html"));
 });
 
-mongoose.connect("mongodb://localhost/stockbroker", {useNewUrlParser: true, useUnifiedTopology: true});
+const uri = process.env.MONGOLAB_URI || 'mongodb://localhost/stockbroker';
+
+mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
