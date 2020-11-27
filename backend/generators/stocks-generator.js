@@ -40,6 +40,7 @@ db.once('open', function() {
 		
 		Promise.all([populateUsers(), populateStocks()]).then(() => {
             console.log("Done populating collections");
+            process.exit();
         });
 	});
 });
