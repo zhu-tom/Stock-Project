@@ -38,11 +38,7 @@ app.use('/api', apiRouter);
 app.use('/auth', authRouter);
 
 app.get('*', (req, res) => {
-    if (process.env.NODE_ENV === "production") {
-        res.sendFile(path.join(__dirname, "/frontend/build/index.html"));
-    } else {
-        res.sendFile(path.join(__dirname, "../frontend", "build/index.html"));
-    }
+    res.sendFile(path.join(__dirname, "../frontend", "build/index.html"));
 });
 
 const uri = process.env.MONGO_URI || 'mongodb://localhost/stockbroker';
