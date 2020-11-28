@@ -6,7 +6,7 @@ const stockData = require("../stock_data.json");
 
 const populateUsers = () => {
     return new Promise(resolve => {
-        bcrypt.hash("admin", 10, (err, encrypted) => {
+        bcrypt.hash("admin", 10, (_, encrypted) => {
             new User({
                 username: "admin",
                 password: encrypted,
@@ -34,7 +34,7 @@ const db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-	mongoose.connection.db.dropDatabase(function(err, result){
+	mongoose.connection.db.dropDatabase(function(err){
 		if(err){
 			console.log("Error dropping database:");
 			console.log(err);
@@ -44,6 +44,7 @@ db.once('open', function() {
 		
 		Promise.all([populateUsers(), ...populateStocks()]).then(() => {
             console.log("Done populating collections");
+            db.close();
             process.exit();
         });
 	});
