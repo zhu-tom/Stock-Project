@@ -5,13 +5,17 @@ const Stock = require("../models/StockModel");
 const stockData = require("../stock_data.json");
 
 const populateUsers = () => {
-    return bcrypt.hash("admin", 10, (err, encrypted) => {
-        new User({
-            username: "admin",
-            password: encrypted,
-            type: "admin"
-        }).save();
-    });
+    return new Promise(resolve => {
+        bcrypt.hash("admin", 10, (err, encrypted) => {
+            new User({
+                username: "admin",
+                password: encrypted,
+                type: "admin"
+            }).save(() => {
+                resolve();
+            });
+        });
+    }) ;
 }
 
 const populateStocks = () => {
@@ -20,7 +24,7 @@ const populateStocks = () => {
             symbol,
             name,
             market,
-        }).save()
+        }).save();
     });
 }
 
@@ -36,9 +40,9 @@ db.once('open', function() {
 			console.log(err);
 			return;
 		}
-		console.log("Dropped database. Starting re-creation.");
+        console.log("Dropped database. Starting re-creation.");
 		
-		Promise.all([populateUsers(), populateStocks()]).then(() => {
+		Promise.all([populateUsers(), ...populateStocks()]).then(() => {
             console.log("Done populating collections");
             process.exit();
         });

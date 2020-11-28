@@ -41,7 +41,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "build/index.html"));
 });
 
-const uri = process.env.MONGOLAB_URI || 'mongodb://localhost/stockbroker';
+const uri = process.env.MONGO_URI || 'mongodb://localhost/stockbroker';
 
 mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
 
