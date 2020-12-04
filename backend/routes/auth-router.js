@@ -68,7 +68,6 @@ router.post("/login", authBodyParser, (req, res) => {
                     req.session.loggedin = true;
                     req.session.username = doc.username;
                     req.session.type = doc.type;
-                    console.log(req.session);
                     res.sendStatus(200);
                 }
             });

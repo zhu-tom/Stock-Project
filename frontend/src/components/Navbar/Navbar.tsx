@@ -1,9 +1,11 @@
 import { Button, Col, Layout, Menu, Row, Space } from 'antd';
 import MenuItem from 'antd/lib/menu/MenuItem';
 import * as React from 'react';
+import { useHistory } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar: React.FC<{}> = () => {
+    const history = useHistory();
     return (
         <Layout.Header>
             <Row>
@@ -16,8 +18,8 @@ const Navbar: React.FC<{}> = () => {
                 </Col>
                 <Col xs={12} >
                     <Space style={{float: 'right'}}>
-                        <Button type="primary" shape="round">Sign Up</Button>
-                        <Button type="default" shape="round">Login</Button>
+                        <Button type="primary" shape="round" onClick={() => history.push("/signup")}>Sign Up</Button>
+                        <Button type="default" shape="round" onClick={() => history.push("/login")}>Login</Button>
                     </Space>
                 </Col>
             </Row>

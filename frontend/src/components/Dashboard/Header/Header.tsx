@@ -49,6 +49,12 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
         )
     });
 
+    const handleLogout = () => {
+        Axios.post("/auth/logout").then(res => {
+            history.push("/login");
+        });
+    }
+
     return (
         <Layout.Header style={{background: '#fff', padding:0}}>
             <Row>
@@ -69,7 +75,7 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
                         <Menu.SubMenu style={{margin: '0 10px', height: '64px'}}icon={<Avatar icon={<UserOutlined/>}/>} key="Acc">
                             <Menu.Item key="4">Profile</Menu.Item>
                             <Menu.Divider/>
-                            <Menu.Item key="5">Log Out</Menu.Item>
+                            <Menu.Item key="5" onClick={handleLogout}>Log Out</Menu.Item>
                         </Menu.SubMenu>
                     </Menu>
                 </Col>

@@ -4,7 +4,7 @@ const router = express.Router();
 const {uidRouter} = require('./user-router');
 
 router.use("/", (req, res, next) => {
-    console.log(req.session);
+    //console.log(req.session);
     if (req.session.loggedin && req.session.username) {
         User.findOne({username: req.session.username}, (err, doc) => {
             if (err) {

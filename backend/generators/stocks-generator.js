@@ -3,19 +3,33 @@ const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const Stock = require("../models/StockModel");
 const stockData = require("../stock_data.json");
+const { use } = require("../routes/me-router");
+
+const users = [
+    {
+        username: "admin",
+        password: "admin",
+    },
+    {
+        username: "user",
+        password: "user",
+    }
+]
 
 const populateUsers = () => {
-    return new Promise(resolve => {
-        bcrypt.hash("admin", 10, (_, encrypted) => {
-            new User({
-                username: "admin",
-                password: encrypted,
-                type: "admin"
-            }).save(() => {
-                resolve();
+    return users.map(({username, password}) => {
+        return new Promise(resolve => {
+            bcrypt.hash(password, 10, (_, encrypted) => {
+                new User({
+                    username: username,
+                    password: encrypted,
+                    type: username === "admin" && "basic"
+                }).save(() => {
+                    resolve();
+                });
             });
         });
-    }) ;
+    })
 }
 
 const populateStocks = () => {
@@ -42,7 +56,7 @@ db.once('open', function() {
 		}
         console.log("Dropped database. Starting re-creation.");
 		
-		Promise.all([populateUsers(), ...populateStocks()]).then(() => {
+		Promise.all([...populateUsers(), ...populateStocks()]).then(() => {
             console.log("Done populating collections");
             db.close();
             process.exit();
