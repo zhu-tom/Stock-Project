@@ -28,9 +28,10 @@ export type WatchlistType = {
     stocks: StockType[]
 }
 
-export type OwnedStockType = Omit<StockType, 'ask'|'daily'> & {
+export type OwnedStockType = {
     amount: number,
     avgPrice: number,
+    stock: StockType,
 }
 
 export type PortfolioType = {

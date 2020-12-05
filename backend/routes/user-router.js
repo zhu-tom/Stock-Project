@@ -61,20 +61,27 @@ uidRouter.get("/portfolio", (req, res) => {
     const { portfolio } = req.user;
 
     if (req.query.stock) {
-        const result = portfolio.find(el => el.symbol === req.query.stock);
-        if (result) {
-            res.send(result);
-        } else {
-            res.status(404).send("Stock Not Found.");
-        }
+        Stock.findOne({symbol: req.query.stock}, (err, doc) => {
+            if (err) {
+                res.status(500).send("Failed to query db");
+            }
+            const result = portfolio.find(el => {
+                return el.stock.equals(doc._id)
+            });
+            if (result) {
+                res.send(result);
+            } else {
+                res.status(404).send("Stock Not Found.");
+            }
+        });
     } else {
-        req.user.populate("portfolio", (err, docs) => {
+        req.user.populate("portfolio.stock", (err, docs) => {
             console.log(docs);
             if (err) {
                 res.status(500).send("Failed to populate");
             } else {
-                const {portfolio, data, cash} = docs;
-                res.status(200).send({portfolio, data, cash});
+                const {portfolio: p, data, cash} = docs;
+                res.status(200).send({portfolio: p, data, cash});
             }
         });
     }

@@ -20,7 +20,9 @@ const Dashboard: React.FC<Props> = ({children}) => {
             if (!res.data.loggedin) {
                 history.push("/login");
             }
-        })
+        }).catch(() => {
+            history.push("/login");
+        });
     }, [history]);
 
     return (

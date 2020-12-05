@@ -15,7 +15,7 @@ const Home: React.FC<{}> = () => {
 
     React.useEffect(() => {
         Axios.get("/api/me/portfolio").then(res => {
-            const newTotal = res.data.portfolio.reduce((prev: number, curr: OwnedStockType) => prev + (curr.amount * curr.price), 0);
+            const newTotal = res.data.portfolio.reduce((prev: number, curr: OwnedStockType) => prev + (curr.amount * curr.stock.price), 0);
             res.data.data.push({datetime: new Date().toISOString(), value: newTotal + res.data.cash});
             setData(res.data);
             setStockTotal(newTotal);
@@ -26,10 +26,10 @@ const Home: React.FC<{}> = () => {
         {
             title: 'Name (Symbol)',
             render(val: OwnedStockType) {
-                return <Link to={`/market/${val.symbol}`}>{`${val.name} (${val.symbol})`}</Link>;
+                return <Link to={`/market/${val.stock.symbol}`}>{`${val.stock.name} (${val.stock.symbol})`}</Link>;
             },
             sorter(a, b) {
-                return a.name > b.name ? 1 : -1;
+                return a.stock.name > b.stock.name ? 1 : -1;
             }
         },
         {
@@ -41,9 +41,11 @@ const Home: React.FC<{}> = () => {
         },
         {
             title: 'Current Value',
-            dataIndex: 'price',
+            render(val: OwnedStockType) {
+                return val.stock.price;
+            },
             sorter(a, b) {
-                return a.price - b.price;
+                return a.stock.price - b.stock.price;
             }
         },
         {

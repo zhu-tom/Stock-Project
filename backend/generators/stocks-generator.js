@@ -3,29 +3,64 @@ const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
 const Stock = require("../models/StockModel");
 const stockData = require("../stock_data.json");
-const { use } = require("../routes/me-router");
+const Order = require("../models/OrdersModel");
 
 const users = [
     {
         username: "admin",
         password: "admin",
+        cash: 10000,
+        symbols: ["TWTR", "CPB"]
     },
     {
         username: "user",
         password: "user",
+        cash: 10000,
+        symbols: ["SPLK", "MITL"]
     }
 ]
 
 const populateUsers = () => {
-    return users.map(({username, password}) => {
+    return users.map(({username, password, cash, symbols}) => {
+        let portfolio = [];
+        let data = {
+            value: cash,
+            date: Date.now()
+        }
         return new Promise(resolve => {
             bcrypt.hash(password, 10, (_, encrypted) => {
-                new User({
-                    username: username,
-                    password: encrypted,
-                    type: username === "admin" && "basic"
-                }).save(() => {
-                    resolve();
+                Promise.all([
+                    ...symbols.map(symbol => Stock.findOneAndUpdate({symbol}, {
+                        price: 100,
+                        daily: {
+                            high: 100,
+                            low: 100,
+                            trades: 1,
+                        }
+                    }, { useFindAndModify: false}).exec()),
+                    // new Order({
+                    //     creator: "none",
+                    //     type: "buy"
+                    // }).save()
+                ]).then((docs) => {
+                    for (const doc of docs) {
+                        portfolio.push({
+                            stock: doc._id,
+                            avgPrice: 100,
+                            amount: 100,
+                        });
+                        data.value += 10000;
+                    }
+                    new User({
+                        username,
+                        password: encrypted,
+                        cash,
+                        portfolio,
+                        data: [data],
+                        type: username === "admin" ? "admin" : "basic"
+                    }).save(() => {
+                        resolve();
+                    });
                 });
             });
         });
@@ -55,11 +90,18 @@ db.once('open', function() {
 			return;
 		}
         console.log("Dropped database. Starting re-creation.");
-		
-		Promise.all([...populateUsers(), ...populateStocks()]).then(() => {
-            console.log("Done populating collections");
-            db.close();
-            process.exit();
-        });
+		Promise.all(populateStocks()).then(() => {
+            Promise.all(populateUsers()).then(() => {
+                console.log("Done populating collections");
+                User.findOne({username: "admin"}, (err, doc) => {
+                    doc.portfolio.findOne({amount: 100}, (e, d) => {
+                        console.log(d);
+                        db.close();
+                        process.exit();
+                    });
+                })
+                
+            })
+        })
 	});
 });

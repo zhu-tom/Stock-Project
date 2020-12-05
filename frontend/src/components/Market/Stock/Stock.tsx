@@ -56,7 +56,6 @@ const Stock = () => {
                         <Descriptions.Item label="# Trades Today">{stock?.daily.trades}</Descriptions.Item>
                         <Descriptions.Item label="Shares Owned">{portfolio?.amount}</Descriptions.Item>
                         <Descriptions.Item label="Avg. Price Paid">{portfolio?.avgPrice}</Descriptions.Item>
-                        <Descriptions.Item label="Current Value">{portfolio?.current}</Descriptions.Item>
                     </Descriptions>
                 </PageHeader>
                 
