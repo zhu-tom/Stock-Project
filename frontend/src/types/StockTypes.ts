@@ -50,6 +50,20 @@ export type SubscriptionType = {
     active: boolean,
 }
 
+export type NotificationType = {
+    _id: string,
+    read: boolean,
+    datetime: string,
+    type: 'trade' | 'sub',
+    user: object,
+    subscription?: SubscriptionType,
+    trade?: {
+        amount: Number,
+        price: Number,
+        order: OrderType,
+    }
+}
+
 export type OrderType = {
     _id: string,
     symbol: string,

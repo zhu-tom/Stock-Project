@@ -4,7 +4,7 @@ import * as React from 'react';
 import _ from 'lodash';
 import Axios from 'axios';
 import { useHistory } from 'react-router-dom';
-import { StockType } from '../../../types/StockTypes';
+import { NotificationType, StockType } from '../../../types/StockTypes';
 import { SelectProps } from 'antd/lib/select';
 
 const data: string[] = ["Notification 1", "Notification 2","Notification 3"];
@@ -14,6 +14,13 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
     const [loading, setLoading] = React.useState(false);
     const history = useHistory();
     const [search, setSearch] = React.useState("");
+    const [notis, setNotis] = React.useState<NotificationType[]>([]);
+
+    React.useEffect(() => {
+        Axios.get('/api/me/notifications?unreadOnly=true').then(res => {
+            setNotis(res.data);
+        });
+    }, []);
 
     const handleSearch = _.debounce((value: string) => {
         doSearch(value);
@@ -69,8 +76,18 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
                 </Col>
                 <Col flex='auto'>
                     <Menu style={{float:'right'}} theme="light" mode="horizontal">
-                        <Menu.SubMenu style={{margin: '0 10px', height:'64px'}} icon={<Badge count={data.length}><NotificationOutlined/></Badge>} key="Noti">
-                            {data.map((value, index) => (<Menu.Item key={index}>{value}</Menu.Item>))}
+                        <Menu.SubMenu style={{margin: '0 10px', height:'64px'}} icon={<Badge count={notis.length}><NotificationOutlined/></Badge>} key="Noti">
+                            {notis.map((value, index) => (
+                                <Menu.Item key={index} onClick={() => {
+                                    history.push(`${value.type === "sub" ? `/account/subscriptions` : `/market/${value.trade?.order.symbol}`}`)
+                                }}>
+                                    <Typography.Text type={value.type === "sub" ? "warning" : "success"}>
+                                        {value.type === "sub" ? 
+                                        `Subscription: ${value.subscription?.symbol} changed by ${value.subscription?.event}%` :
+                                        `Trade: ${value.trade?.order.symbol} - ${value.trade?.amount} units at $${value.trade?.price}`}
+                                    </Typography.Text>
+                                </Menu.Item>
+                            ))}
                         </Menu.SubMenu>
                         <Menu.SubMenu style={{margin: '0 10px', height: '64px'}}icon={<Avatar icon={<UserOutlined/>}/>} key="Acc">
                             <Menu.Item key="4">Profile</Menu.Item>

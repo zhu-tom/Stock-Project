@@ -2,6 +2,7 @@ const express = require('express');
 const Order = require('../models/OrdersModel');
 const Stock = require('../models/StockModel');
 const User = require('../models/UserModel');
+const notificationsRouter = require('./notifications-router');
 const subscriptionsRouter = require('./subscriptions-router');
 const watchlistRouter = require('./watchlist-router');
 
@@ -56,6 +57,8 @@ uidRouter.post("/deposit", cashBodyParser, (req, res) => {
         res.status(500).send("Failed to save to db")
     });
 });
+
+uidRouter.use("/notifications", notificationsRouter);
 
 uidRouter.get("/portfolio", (req, res) => {
     const { portfolio } = req.user;
