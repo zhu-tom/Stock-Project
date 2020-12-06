@@ -40,9 +40,13 @@ const userSchema = new mongoose.Schema({
     },
     data: {
         type: [{
-            datetime: Date,
+            datetime: {
+                type: Date,
+                default: Date.now
+            },
             value: Number,
         }],
+        default: [],
         required: true,
     },
 });

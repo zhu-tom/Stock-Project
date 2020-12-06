@@ -71,7 +71,7 @@ const Orders = () => {
         },
         {
             title: "Amount",
-            dataIndex: 'Amount',
+            dataIndex: 'amount',
             sorter(a, b) {
                 return a.amount - b.amount;
             }

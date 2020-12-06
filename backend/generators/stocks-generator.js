@@ -35,13 +35,13 @@ const populateUsers = () => {
                         daily: {
                             high: 100,
                             low: 100,
-                            trades: 1,
+                            trades: 0,
+                        },
+                        current: {
+                            ask: 20,
+                            bid: 0,
                         }
                     }, { useFindAndModify: false}).exec()),
-                    // new Order({
-                    //     creator: "none",
-                    //     type: "buy"
-                    // }).save()
                 ]).then((docs) => {
                     for (const doc of docs) {
                         portfolio.push({
@@ -58,8 +58,16 @@ const populateUsers = () => {
                         portfolio,
                         data: [data],
                         type: username === "admin" ? "admin" : "basic"
-                    }).save(() => {
-                        resolve();
+                    }).save((_, doc) => {
+                        Promise.all(symbols.map(symbol => new Order({
+                            creator: doc._id,
+                            type: "sell",
+                            symbol,
+                            amount: 20,
+                            price: 20,
+                        }).save())).then(() => {
+                            resolve();
+                        })
                     });
                 });
             });
@@ -93,15 +101,9 @@ db.once('open', function() {
 		Promise.all(populateStocks()).then(() => {
             Promise.all(populateUsers()).then(() => {
                 console.log("Done populating collections");
-                User.findOne({username: "admin"}, (err, doc) => {
-                    doc.portfolio.findOne({amount: 100}, (e, d) => {
-                        console.log(d);
-                        db.close();
-                        process.exit();
-                    });
-                })
-                
-            })
-        })
+                db.close();
+                process.exit();
+            });
+        });
 	});
 });

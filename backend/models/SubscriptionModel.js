@@ -14,6 +14,14 @@ const subSchema = new mongoose.Schema({
         min: 0,
         required: true,
     },
+    min: {
+        type: Number,
+        min: 0,
+    },
+    max: {
+        type: Number,
+        min: 0,
+    },
     active: {
         type: Boolean,
         default: true,

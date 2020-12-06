@@ -21,7 +21,7 @@ const History = () => {
             render(item) {
                 return <>
                     {`${item.type.charAt(0).toUpperCase().concat(item.type.slice(1))} ${item.amount} `}
-                    {(item.type === "buy" || item.type === "sell") ? <><Link to={`/market/${item.symbol}`}>{item.symbol}</Link>{` at ${item.price}`}</>:""}
+                    {(item.type === "buy" || item.type === "sell") ? <><Link to={`/market/${item.symbol}`}>{item.symbol}</Link>{` at $${item.price}`}</>:""}
                 </>
             },
             sorter(a, b) {

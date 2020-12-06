@@ -62,6 +62,17 @@ const stockSchema = new mongoose.Schema({
         default: {bid: 0, ask: 0},
         required: true,
     },
+    trades: {
+        type: [{
+            datetime: {
+                type: Date,
+                default: Date.now,
+            },
+            price: Number
+        }],
+        default: [],
+        required: true,
+    }
 });
 
 stockSchema.methods.findOrders = function(cb) {

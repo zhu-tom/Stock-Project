@@ -68,15 +68,17 @@ subscriptionsRouter.post("/:id", (req, res) => {
 subscriptionsRouter.post("/", (req, res) => {
     const {symbol, event} = req.body;
     if (symbol && event) {
-        Stock.findOne({symbol}, (err, doc) => {
-            if (err) {
-                console.log(err);
+        Stock.findOne({symbol}, (e, d) => {
+            if (e) {
+                console.log(e);
                 res.status(500).send("Failed to query");
-            } else if (doc) {
+            } else if (d) {
                 new Subscription({
                     creator: req.user._id,
-                    symbol: doc.symbol,
+                    symbol: d.symbol,
                     event: req.body.event,
+                    min: d.price * (1 - (req.body.event / 100)),
+                    max: d.price * (1 + (req.body.event / 100))
                 }).save((err, doc) => {
                     if (err) {
                         console.log(err);

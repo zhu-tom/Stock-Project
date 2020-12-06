@@ -76,7 +76,6 @@ uidRouter.get("/portfolio", (req, res) => {
         });
     } else {
         req.user.populate("portfolio.stock", (err, docs) => {
-            console.log(docs);
             if (err) {
                 res.status(500).send("Failed to populate");
             } else {
@@ -106,6 +105,7 @@ uidRouter.get("/orders", (req, res) => {
         if (err) {
             res.status(500).send("Failed to query");
         } else {
+            console.log(docs);
             res.status(200).send(docs);
         }
     });
