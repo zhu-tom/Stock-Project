@@ -79,10 +79,8 @@ const Home: React.FC<{}> = () => {
                             <Link to="/account/portfolio/deposit"><Button block type="default">Deposit</Button></Link>
                         </Space>  
                         <Row>
-                            <Col flex="auto"><Statistic title="Today" value={11.28} precision={2} valueStyle={{ color: '#3f8600' }} prefix={<ArrowUpOutlined/>} suffix="%"/></Col>
                             <Col flex="auto"><Statistic title="Cash" value={data?.cash} precision={2} prefix={<DollarCircleFilled/>}/></Col>
-                            <Col flex="auto"><Statistic title="Stock" value={stockTotal} precision={2} prefix={<FundFilled/>}/></Col>
-                           
+                            <Col flex="auto"><Statistic title="Stock" value={stockTotal} precision={2} prefix={<FundFilled/>}/></Col>          
                         </Row>
                     </Layout>
                 </Col>
