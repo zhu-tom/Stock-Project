@@ -13,7 +13,8 @@ const columns: ColumnsType<StockType> = [
         },
         sorter(a, b) {
             return a.symbol > b.symbol ? 1 : -1;
-        }
+        },
+        fixed: 'left'
     },
     {
         title: 'Name',
@@ -101,6 +102,7 @@ const Home = () => {
         <Table 
             dataSource={data}
             loading={loading}
+            scroll={{x: 1300}}
             pagination={{
                 onChange: (pg, pageSize) => {
                     console.log("change");

@@ -38,7 +38,12 @@ const Home: React.FC<Props> = ({watchlists, setWatchlists}) => {
                         onClick={() => {
                             Axios.delete(`/api/me/watchlists/${val._id}`).then(res => {
                                 setWatchlists(res.data);
-                            })
+                            }).catch(err => {
+                                notification.open({
+                                    message: "Error",
+                                    description: err.response.data
+                                });
+                            });
                         }}><DeleteOutlined/></Button>
             }
         }
@@ -70,8 +75,22 @@ const Home: React.FC<Props> = ({watchlists, setWatchlists}) => {
                 <Input placeholder="Watchlist Name" value={watchlistName} onChange={({target}) => setWatchlistName(target.value)}/>
             </Modal>
             <Button onClick={() => setIsVisible(true)} style={{marginBottom: "16px"}} type="primary"><PlusOutlined/>Create A New Watchlist</Button>
-            {selectedRowKeys.length > 0 && <Button danger type="primary">{`Delete All (${selectedRowKeys.length})`}</Button>}
-            <Table rowKey="id" rowSelection={{type: 'checkbox', ...rowSelection}} dataSource={watchlists} columns={columns}>
+            {selectedRowKeys.length > 0 && 
+                <Button danger type="primary" onClick={() => {
+                    selectedRowKeys.forEach(id => {
+                        Axios.delete(`/api/me/watchlists/${id}`).then(res => {
+                            setWatchlists(res.data);
+                        }).catch(err => {
+                            notification.open({
+                                message: "Error",
+                                description: err.response.data
+                            });
+                        }).finally(() => {
+                            setSelectedKeys([]);
+                        });
+                    });
+                }}>{`Delete All (${selectedRowKeys.length})`}</Button>}
+            <Table rowKey="_id" rowSelection={{type: 'checkbox', ...rowSelection}} dataSource={watchlists} columns={columns}>
             </Table>
         </>
     );

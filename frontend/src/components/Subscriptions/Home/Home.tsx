@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, notification, Space, Switch, Table } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { TableRowSelection } from "antd/lib/table/interface";
@@ -11,8 +11,8 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
     const [selectedRowKeys, setSelectedKeys]: [React.Key[], any] = React.useState([]);
 
     const rowSelection: TableRowSelection<SubscriptionType> = {
-        onChange(selectedRowKeys) {
-            setSelectedKeys(selectedRowKeys);
+        onChange(srk) {
+            setSelectedKeys(srk);
         },
         selectedRowKeys,
     }
@@ -25,13 +25,6 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
             },
             sorter(a, b) {
                 return a.symbol < b.symbol ? -1 : 1;
-            }
-        },
-        {
-            title: "Name",
-            dataIndex: "name",
-            sorter(a, b) {
-                return a.name < b.name ? -1 : 1;
             }
         },
         {
@@ -78,10 +71,24 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
     return (
         <>
             <Space style={{marginBottom: "16px"}}>
-                <Button type="primary"><PlusOutlined/>Add New Event Subscription</Button>
-                {selectedRowKeys.length > 0 && <Button type="primary" danger>{`Delete All (${selectedRowKeys.length})`}</Button>}
+                {selectedRowKeys.length > 0 && 
+                    <Button type="primary" danger onClick={() => {
+                        selectedRowKeys.forEach(id => {
+                            Axios.delete(`/api/me/subscriptions/${id}`).then(res => {
+                                let copy = [...subscriptions];
+                                setSubscriptions(copy.filter(item => item._id !== id));
+                            }).catch(err => {
+                                notification.open({
+                                    message: "Error",
+                                    description: err.response.data
+                                });
+                            }).finally(() => {
+                                setSelectedKeys([]);
+                            });
+                        });
+                    }}>{`Delete All (${selectedRowKeys.length})`}</Button>}
             </Space>
-            <Table rowKey="id" columns={columns} rowSelection={rowSelection} dataSource={subscriptions}/>
+            <Table rowKey="_id" columns={columns} rowSelection={rowSelection} dataSource={subscriptions}/>
         </>
     );
 }

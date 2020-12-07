@@ -11,7 +11,7 @@ const Watchlists = () => {
     const { path } = useRouteMatch();
     const [ watchlists, setWatchlists ] = React.useState<WatchlistType[] | undefined>(undefined);
 
-    React.useEffect(() => {
+    const getData = React.useCallback(() => {
         Axios.get("/api/me/watchlists").then(res => {
             console.log(res.data);
             setWatchlists(res.data);
@@ -22,6 +22,13 @@ const Watchlists = () => {
             });
         });
     }, []);
+
+    React.useEffect(() => {
+        getData();
+        setInterval(() => {
+            getData();
+        }, 1000 * 60);
+    }, [getData]);
     
     return (
         <>

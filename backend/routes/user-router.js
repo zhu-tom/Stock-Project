@@ -113,7 +113,7 @@ uidRouter.get("/history", (req, res) => {
     });
 });
 
-uidRouter.get("/orders", (req, res) => {
+const sendOrders = (req, res) => {
     req.user.findOrders((err, docs) => {
         if (err) {
             res.status(500).send("Failed to query");
@@ -121,7 +121,33 @@ uidRouter.get("/orders", (req, res) => {
             res.status(200).send(docs);
         }
     });
-})
+};
+
+uidRouter.get("/orders", sendOrders);
+
+uidRouter.put("/orders/:orderId", (req, res, next) => {
+    req.order.done = true;
+    req.order.save(err => {
+        if (err) {
+            res.status(500).send("Error updating db");
+        } else {
+            next()
+        }
+    });
+}, sendOrders);
+
+uidRouter.param("orderId", (req, res, next) => {
+    Order.findById(req.params.orderId, (err, doc) => {
+        if (err) {
+            res.status(500).send("Error querying db");
+        } else if (doc) {
+            req.order = doc;
+            next();
+        } else {
+            res.status(404).send("Order not found");
+        }
+    });
+});
 
 uidRouter.get("/", (req, res) => {
     const { username, name, avatar } = req.user;

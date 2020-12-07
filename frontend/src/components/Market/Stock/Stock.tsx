@@ -22,7 +22,7 @@ const Stock = () => {
     const [subForm] = Form.useForm();
     const [orderForm] = Form.useForm();
 
-    React.useEffect(() => {
+    const getData = React.useCallback(() => {
         Axios.get(`/api/stocks/symbol/${symbol}`).then(res => {
             setStock(res.data);
             console.log(res.data);
@@ -32,12 +32,19 @@ const Stock = () => {
                 description: err.response.data
             });
         });
+    }, [symbol]);
+
+    React.useEffect(() => {
+        getData();
+        setInterval(() => {
+            getData();
+        }, 1000 * 60);
         Axios.get(`/api/me/portfolio?stock=${symbol}`).then(res => {
             setPortfolio(res.data);
         }).catch(() => {
             console.log("not found");
         });
-    }, [symbol]);
+    }, [symbol, getData]);
 
     return (
         <>

@@ -13,7 +13,7 @@ const Home: React.FC<{}> = () => {
     const [data, setData] = React.useState<PortfolioType|undefined>(undefined);
     const [stockTotal, setStockTotal] = React.useState<number>(0);
 
-    React.useEffect(() => {
+    const getData = React.useCallback(() => {
         Axios.get("/api/me/portfolio").then(res => {
             const newTotal = res.data.portfolio.reduce((prev: number, curr: OwnedStockType) => prev + (curr.amount * curr.stock.price), 0);
             res.data.data.push({datetime: new Date().toISOString(), value: newTotal + res.data.cash});
@@ -26,6 +26,13 @@ const Home: React.FC<{}> = () => {
             });
         });
     }, []);
+    
+    React.useEffect(() => {
+        getData();
+        setInterval(() => {
+            getData();
+        }, 1000 * 60);
+    }, [getData]);
 
     const columns: ColumnsType<any> = [
         {

@@ -36,10 +36,12 @@ const Orders = () => {
             },
             sorter(a, b) {
                 return a.symbol > b.symbol ? 1 : -1;
-            }
+            },
+            fixed: 'left'
         },
         {
             title: "Type",
+            fixed: 'left',
             filters: [
                 {
                     text: "Buy",
@@ -92,8 +94,17 @@ const Orders = () => {
         },
         {
             title: "",
-            render() {
-                return <Button danger type="primary">Cancel</Button>
+            render(val: OrderType, _, index) {
+                return <Button danger type="primary" onClick={() => {
+                    Axios.put(`/api/me/orders/${val._id}`).then(res => {
+                        setData(res.data);
+                    }).catch(err => {
+                        notification.open({
+                            message: "Error",
+                            description: err.response.data
+                        });
+                    });
+                }}>Cancel</Button>
             },
         }
     ]
@@ -101,8 +112,22 @@ const Orders = () => {
     return (
         <>
             <Breadcrumb/>
-            {selectedRowKeys.length > 0 && <Button style={{marginBottom: '16px'}} type="primary" danger>{`Cancel All (${selectedRowKeys.length})`}</Button>}
-            <Table rowKey="id" rowSelection={rowSelection} dataSource={data} columns={columns}/>
+            {selectedRowKeys.length > 0 && 
+            <Button style={{marginBottom: '16px'}} type="primary" danger onClick={() => {
+                selectedRowKeys.forEach(key => {
+                    Axios.put(`/api/me/orders/${key}`).then(res => {
+                        setData(res.data);
+                    }).catch(err => {
+                        notification.open({
+                            message: "Error",
+                            description: err.response.data
+                        });
+                    }).finally(() => {
+                        setSelectedKeys([]);
+                    });
+                });
+            }}>{`Cancel All (${selectedRowKeys.length})`}</Button>}
+            <Table scroll={{x: 1300}} rowKey="_id" rowSelection={rowSelection} dataSource={data} columns={columns}/>
         </>
     );
 }
