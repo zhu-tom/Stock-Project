@@ -1,14 +1,14 @@
 import { notification, Table } from 'antd';
 import * as React from 'react';
 import moment from 'moment';
-import { TradeType, TransferType } from '../../types/StockTypes';
+import { OrderType, TransferType } from '../../types/StockTypes';
 import Breadcrumb from '../Dashboard/Breadcrumb/Breadcrumb';
 import { ColumnsType } from 'antd/lib/table';
 import Axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const History = () => {
-    const [data, setData] = React.useState<(TransferType | TradeType)[]>([]);
+    const [data, setData] = React.useState<(TransferType | OrderType)[]>([]);
 
     React.useEffect(() => {
         Axios.get("/api/me/history").then(res => {
@@ -20,12 +20,12 @@ const History = () => {
             });
         });
     })
-    const columns: ColumnsType<TransferType | TradeType> = [
+    const columns: ColumnsType<OrderType | TransferType> = [
         {
             title: "Action",
-            render(item) {
+            render(item: OrderType) {
                 return <>
-                    {`${item.type.charAt(0).toUpperCase().concat(item.type.slice(1))} ${item.amount} `}
+                    {`${item.type.charAt(0).toUpperCase().concat(item.type.slice(1))} ${item.fulfilled && item.amount} `}
                     {(item.type === "buy" || item.type === "sell") ? <><Link to={`/market/${item.symbol}`}>{item.symbol}</Link>{` at $${item.price}`}</>:""}
                 </>
             },
