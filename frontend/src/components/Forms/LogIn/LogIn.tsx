@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, Row } from 'antd';
+import { Button, Card, Col, Form, Input, notification, Row } from 'antd';
 import Axios from 'axios';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
@@ -16,6 +16,11 @@ const Login = () => {
             if (res.status === 200) {
                 history.push("/");
             }
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
         });
     }
 

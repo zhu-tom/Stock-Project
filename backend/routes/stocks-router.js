@@ -7,24 +7,61 @@ const User = require('../models/UserModel');
 
 const router = express.Router();
 
+let open = true;
+
 const marketQueryParser = (req, res, next) => {
+    console.log(req.query);
     if (!req.query.q || !req.query.q.length) {
         req.query.q = /.*/;
     }
     if (!req.query.limit) {
         req.query.limit = 10;
     }
+    if (!req.query.page) {
+        req.query.page = 1
+    }
+    req.query.limit = parseInt(req.query.limit);
+    req.query.page = parseInt(req.query.page);
+
     next();
 }
 
 router.get("/", marketQueryParser, (req, res) => {
-    Stock.find({$or: [{symbol: {$regex: req.query.q, $options: "i"}}, {name: {$regex: req.query.q, $options: "i"}}]}).limit(req.query.limit).exec((err, docs) => {
+    Stock.find({$or: [
+        {symbol: {$regex: req.query.q, $options: "i"}}, 
+        {name: {$regex: req.query.q, $options: "i"}}
+    ]}).skip(req.query.limit * (req.query.page - 1)).limit(req.query.limit).exec((err, docs) => {
         if (err) {
+            console.log(err);
             res.status(500).send("Failed to query");
         } else {
             res.send(docs);
         }
     });
+});
+
+const adminRestrict = (req, res, next) => {
+    if (req.user.type === "admin") {
+        next();
+    } else {
+        res.status(403).send("Must be admin");
+    }
+}
+
+router.put("/end", adminRestrict, (req, res) => {
+    Order.updateMany({expiry: "day", done: false}, {done: true}).then((err) => {
+        if (err) {
+            res.status(500).send("Error updating db");
+        } else {
+            open = false;
+            res.sendStatus(200);
+        }
+    });
+});
+
+router.put("/start", adminRestrict, (req, res) => {
+    open = true;
+    res.sendStatus(200);
 });
 
 router.get("/market/:market", (req, res) => {
@@ -56,40 +93,58 @@ const tradeRouter = express.Router();
 router.use("/symbol/:symbol", tradeRouter);
 
 tradeRouter.get("/", (req, res) => {
-    res.send(req.symbol);
+    let newTrades = [];
+    if (req.query.startDate || req.query.endDate) {
+        req.query.startDate = req.query.startDate ? new Date(req.query.startDate) : new Date(-8640000000000000);
+        req.query.endDate = req.query.endDate ? new Date(req.query.endDate) : new Date(8640000000000000);
+        for (let i = 0; i < req.symbol.trades.length; i++) {
+            let doc = new Date(req.symbol.trades[i].datetime);
+            if (doc > req.query.startDate && doc < req.query.endDate) {
+                newTrades.push(req.symbol.trades[i]);
+            }
+        }
+        req.symbol.trades = newTrades;
+    }
+    res.status(200).send(req.symbol);
 });
 
 const tradeBodyParser = (req, res, next) => {
-    if (req.body.amount && req.body.price && req.body.type) {
-        if (req.body.type !== "buy" && req.body.type !== "sell") {
-            res.status(400).send("Invalid type");
-        } else if (req.session.loggedin) {
-            User.findOne({username: req.session.username}, (err, doc) => {
-                if (err) {
-                    res.status(500).send("Failed to query");
-                } else if (doc) {
-                    req.user = doc;
-                    next();
-                } else {
-                    res.status(404).send("User not found");
-                }
-            });
+    if (open) {
+        if (req.body.amount && req.body.price && req.body.type && req.body.expiry) {
+            if (req.body.type !== "buy" && req.body.type !== "sell") {
+                res.status(400).send("Invalid type");
+            } else if (req.session.loggedin) {
+                User.findOne({username: req.session.username}, (err, doc) => {
+                    if (err) {
+                        res.status(500).send("Failed to query");
+                    } else if (doc) {
+                        req.user = doc;
+                        next();
+                    } else {
+                        res.status(404).send("User not found");
+                    }
+                });
+            } else {
+                res.status(401).send("Not logged in");
+            }
         } else {
-            res.status(401).send("Not logged in");
+            res.status(400).send("Bad Request Body");
         }
     } else {
-        res.status(400).send("Bad Request Body");
+        res.status(403).send("Market closed");
     }
+    
 }
 
 tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
-    let {amount, price, type} = req.body;
-    const order = new Order({
+    let {amount, price, type, expiry} = req.body;
+    let order = new Order({
         amount,
         price,
         type,
         creator: req.user._id,
-        symbol: req.symbol.symbol
+        symbol: req.symbol.symbol,
+        expiry
     });
     if (type === "buy") {
         if (amount * price > req.user.cash) {
@@ -131,7 +186,7 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                                 const sum = (val.amount * val.avgPrice) - (amountDiff * currDoc.price);
                                 newPort.push({
                                     ...val.toJSON(), 
-                                    amount: val.amount - order.amount,  
+                                    amount: val.amount - amountDiff,  
                                     avgPrice: sum / newAmt
                                 })
                             }
@@ -139,8 +194,6 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                             newPort.push(val.toJSON());
                         }
                     }
-
-                    console.log(newPort);
 
                     seller.portfolio = newPort;
 
@@ -153,7 +206,7 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
             
                     const i = req.user.portfolio.findIndex(val => val.stock.equals(req.symbol._id)); // buyer's stock
                     if (i === -1) { // if not found, add to the portfolio
-                        req.user.portfolio.push({amount: order.amount, avgPrice: currDoc.price, stock: req.symbol._id});
+                        req.user.portfolio.push({amount: amountDiff, avgPrice: currDoc.price, stock: req.symbol._id});
                     } else {
                         let sum = req.user.portfolio[i].avgPrice * req.user.portfolio[i].amount; // old sum for avgPrice
                         sum += currDoc.price * amountDiff; // add newly purchased stock
@@ -168,18 +221,31 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                     req.symbol.daily.trades += 1;
                     req.symbol.trades.push({price: currDoc.price});
 
+                    const noti = new Notification({
+                        type: "trade",
+                        user: seller._id,
+                        trade: {
+                            amount: amountDiff,
+                            price: currDoc.price,
+                            order: currDoc._id,
+                        }
+                    });
+
                     await Promise.all([
                         currDoc.save(), 
                         seller.save(),
+                        noti.save(),
                     ]);
                 }
                 order.fulfilled = order.amount - amount;
 
+                order = await order.save();
+
                 const ask = await req.symbol.findOrders().find({type: "sell", done: false}).sort({price: 'asc'}).limit(1).exec();
                 const bid = await req.symbol.findOrders().find({type: "buy", done: false}).sort({price: 'desc'}).limit(1).exec();
 
-                req.symbol.current.ask = ask && 0;
-                req.symbol.current.bid = bid && 0;
+                req.symbol.current.ask = (ask && ask[0] && ask[0].price) || 0;
+                req.symbol.current.bid = (bid && bid[0] && bid[0].price) || 0;
 
                 req.user.data.push({
                     date: Date.now(),
@@ -205,12 +271,27 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                     subscription: doc._id,
                 }).save());
 
+                req.symbol.markModified("current");
+                req.symbol.markModified("daily");
+
                 await Promise.all([
-                    order.save(),
                     req.symbol.save(),
                     req.user.save(),
                     ...toNoti,        
                 ]);
+
+                if (order.fulfilled > 0) {
+                    await new Notification({
+                        type: "trade",
+                        user: req.user._id,
+                        trade: {
+                            amount: order.fulfilled,
+                            price: order.price,
+                            order: order._id
+                        }
+                    }).save();
+                }
+
                 res.sendStatus(200);
             });
         }
@@ -257,7 +338,7 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                                 const sum = (val.amount * val.avgPrice) - (amountDiff * currDoc.price)
                                 newPort.push({
                                     ...val.toJSON(), 
-                                    amount: val.amount - order.amount,  
+                                    amount: val.amount - amountDiff,  
                                     avgPrice: sum / newAmt
                                 });
                             }
@@ -270,7 +351,7 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
         
                     const i = buyer.portfolio.findIndex(val => val.stock.equals(req.symbol._id));
                     if (i === -1) {
-                        buyer.portfolio.push({amount: order.amount, avgPrice: currDoc.price, stock: req.symbol._id});
+                        buyer.portfolio.push({amount: amountDiff, avgPrice: currDoc.price, stock: req.symbol._id});
                     } else {
                         let sum = buyer.portfolio[i].avgPrice * buyer.portfolio[i].amount;
                         sum += currDoc.price * amountDiff;
@@ -288,7 +369,7 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                     
                     req.symbol.price = currDoc.price;
                     req.symbol.daily.high = Math.max(currDoc.price, req.symbol.daily.high);
-                    req.symbol.daily.low = Math.min(currDoc.price, req.symbol.daily.low)
+                    req.symbol.daily.low = Math.min(currDoc.price, req.symbol.daily.low);
                     req.symbol.daily.trades += 1;
                     req.symbol.trades.push({price: currDoc.price});
 
@@ -310,11 +391,13 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                 }
                 order.fulfilled = order.amount - amount;
 
+                order = await order.save();
+
                 const ask = await req.symbol.findOrders().find({type: "sell", done: false}).sort({price: 'asc'}).limit(1).exec();
                 const bid = await req.symbol.findOrders().find({type: "buy", done: false}).sort({price: 'desc'}).limit(1).exec();
 
-                req.symbol.current.ask = ask && 0;
-                req.symbol.current.bid = bid && 0;
+                req.symbol.current.ask = (ask && ask[0] && ask[0].price) || 0;
+                req.symbol.current.bid = (bid && bid[0] && bid[0].price) || 0;
 
                 req.user.data.push({
                     date: Date.now(),
@@ -340,8 +423,10 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                     subscription: doc._id,
                 }).save());
 
-                const result = await Promise.all([
-                    order.save(),
+                req.symbol.markModified("current");
+                req.symbol.markModified("daily");
+
+                await Promise.all([
                     req.symbol.save(),
                     req.user.save(),
                     ...toNoti,
@@ -354,7 +439,7 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
                         trade: {
                             amount: order.fulfilled,
                             price: order.price,
-                            order: result[0]._id
+                            order: order._id
                         }
                     }).save();
                 }

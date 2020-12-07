@@ -6,6 +6,7 @@ import Edit from './Edit/Edit';
 import Home from './Home/Home';
 import Axios from 'axios';
 import _ from 'lodash';
+import { notification } from 'antd';
 
 const Subscriptions = () => {
     const { path } = useRouteMatch();
@@ -15,7 +16,10 @@ const Subscriptions = () => {
         Axios.get("/api/me/subscriptions").then(data => {
             setSubscriptions(data.data);
         }).catch(err => {
-            console.log(err);
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
         });
     }, []);
 
@@ -23,6 +27,11 @@ const Subscriptions = () => {
         setSubscriptions(subscriptions.map((val, index) => {
             Axios.post(`/api/me/subscriptions/${id}/active`).then((data) => {
                 console.log(data);
+            }).catch(err => {
+                notification.open({
+                    message: "Error",
+                    description: err.response.data
+                });
             });
             if (index === i) {
                 return ({

@@ -1,5 +1,5 @@
 import { ArrowUpOutlined, DollarCircleFilled, FundFilled } from '@ant-design/icons';
-import { Button, Col, Layout, Row, Space, Statistic, Table, Tabs } from 'antd';
+import { Button, Col, Layout, notification, Row, Space, Statistic, Table, Tabs } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import * as React from 'react';
 import AreaChart from '../../Charts/Area/Area';
@@ -19,6 +19,11 @@ const Home: React.FC<{}> = () => {
             res.data.data.push({datetime: new Date().toISOString(), value: newTotal + res.data.cash});
             setData(res.data);
             setStockTotal(newTotal);
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
         });
     }, []);
 

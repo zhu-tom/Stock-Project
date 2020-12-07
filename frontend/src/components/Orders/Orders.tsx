@@ -1,4 +1,4 @@
-import { Button, Table } from 'antd';
+import { Button, notification, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import * as React from 'react';
@@ -14,6 +14,11 @@ const Orders = () => {
 
     Axios.get("/api/me/orders").then(res => {
         setData(res.data);
+    }).catch(err => {
+        notification.open({
+            message: "Error",
+            description: err.response.data
+        });
     });
 
     const rowSelection: TableRowSelection<OrderType> = {

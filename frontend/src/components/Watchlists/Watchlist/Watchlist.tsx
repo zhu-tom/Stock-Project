@@ -1,4 +1,4 @@
-import { Button, Table } from 'antd';
+import { Button, notification, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import * as React from 'react';
@@ -68,6 +68,11 @@ const Watchlist: React.FC<Props> = ({watchlists, setWatchlists}) => {
                     Axios.delete(`/api/me/watchlists/${id}/symbol/${item._id}`).then((data) => {
                         console.log(data.data);
                         setWatchlists(data.data);
+                    }).catch(err => {
+                        notification.open({
+                            message: "Error",
+                            description: err.response.data
+                        });
                     })
                 }}>Remove</Button>
             }

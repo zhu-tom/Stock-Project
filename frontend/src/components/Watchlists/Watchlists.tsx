@@ -5,6 +5,7 @@ import Home from './Home/Home';
 import { WatchlistType } from "../../types/StockTypes";
 import Watchlist from './Watchlist/Watchlist';
 import Axios from 'axios';
+import { notification } from 'antd';
 
 const Watchlists = () => {
     const { path } = useRouteMatch();
@@ -14,6 +15,11 @@ const Watchlists = () => {
         Axios.get("/api/me/watchlists").then(res => {
             console.log(res.data);
             setWatchlists(res.data);
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
         });
     }, []);
     

@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, Row } from 'antd';
+import { Button, Card, Col, Form, Input, notification, Row } from 'antd';
 import Axios from 'axios';
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
@@ -17,6 +17,10 @@ class SignUp extends React.Component<RouteComponentProps, {}> {
                                 Axios.post("/auth/signup", {username, password}).then(res => {
                                     this.props.history.push("/");
                                 }).catch(err => {
+                                    notification.open({
+                                        message: "Error",
+                                        description: err.response.data
+                                    });
                                     console.log(err);
                                 });
                             }} labelCol={{span: 8}} wrapperCol={{span: 16}}>

@@ -1,5 +1,5 @@
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Input, Modal, Table } from 'antd'
+import { Button, Input, Modal, notification, Table } from 'antd'
 import { ColumnsType } from 'antd/lib/table';
 import { TableRowSelection } from 'antd/lib/table/interface';
 import Axios from 'axios';
@@ -54,7 +54,12 @@ const Home: React.FC<Props> = ({watchlists, setWatchlists}) => {
     const handleOk = () => {
         Axios.post("/api/me/watchlists", {name: watchlistName}).then(res => {
             setWatchlists(res.data);
-        })
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
+        });
         setIsVisible(false);
         setWatchlistName("");
     }

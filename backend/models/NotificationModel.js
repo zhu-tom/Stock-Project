@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const notiSchema = new mongoose.Schema({
+const notificationSchema = new mongoose.Schema({
     read: {
         type: Boolean,
         default: false,
@@ -35,6 +35,7 @@ const notiSchema = new mongoose.Schema({
             order: {
                 type: mongoose.Types.ObjectId,
                 ref: "Order",
+                required: true,
             },
         },
         required: () => {
@@ -43,6 +44,6 @@ const notiSchema = new mongoose.Schema({
     },
 });
 
-const Notification = mongoose.model("Notification", notiSchema);
+const Notification = mongoose.model("Notification", notificationSchema);
 
 module.exports = Notification;

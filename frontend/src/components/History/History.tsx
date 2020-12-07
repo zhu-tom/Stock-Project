@@ -1,4 +1,4 @@
-import { Table } from 'antd';
+import { notification, Table } from 'antd';
 import * as React from 'react';
 import moment from 'moment';
 import { TradeType, TransferType } from '../../types/StockTypes';
@@ -13,6 +13,11 @@ const History = () => {
     React.useEffect(() => {
         Axios.get("/api/me/history").then(res => {
             setData(res.data);
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
         });
     })
     const columns: ColumnsType<TransferType | TradeType> = [

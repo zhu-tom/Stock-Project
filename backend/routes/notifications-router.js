@@ -1,5 +1,6 @@
 const express = require("express");
 const Notification = require("../models/NotificationModel");
+const Order = require("../models/OrdersModel");
 
 const notificationsRouter = express.Router();
 
@@ -14,17 +15,22 @@ notificationsRouter.get("/", queryParser, (req, res) => {
     const query = {
         user: req.user._id,
     }
-    if (unreadOnly) {
+    if (req.query.unreadOnly) {
         query.read = false;
     }
-    Notification.find(query)
-        .populate("subscription")
-        .populate("trade")
+    Notification.find(query).populate("subscription")        
         .exec((err, docs) => {
         if (err) {
+            console.log(err);
             res.status(500).send("Error querying db");
         } else {
-            res.status(200).send(docs);
+            Promise.all(docs.map(async doc => {
+                doc.trade.order = await Order.findById(doc.trade.order);
+                return doc;
+            })).then(val => {
+                console.log(val);
+                res.status(200).send(val);
+            })
         }
     });
 });

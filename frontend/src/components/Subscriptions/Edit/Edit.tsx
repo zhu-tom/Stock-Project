@@ -1,4 +1,4 @@
-import { Button, Card, Form, Input, InputNumber } from 'antd';
+import { Button, Card, Form, Input, InputNumber, notification } from 'antd';
 import * as React from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { SubscriptionType } from '../../../types/StockTypes';
@@ -16,6 +16,11 @@ const Edit: React.FC<{subscriptions: SubscriptionType[], setSubscriptions: any}>
             console.log(res.data);
             setItem(res.data);
             form.setFieldsValue(res.data);
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err
+            });
         });
     }, [id, form]);
 
@@ -25,7 +30,7 @@ const Edit: React.FC<{subscriptions: SubscriptionType[], setSubscriptions: any}>
         <Card>
             <Form initialValues={{event: item?.event, symbol: item?.symbol}} onFinish={(values) => {
                 setLoading(true);
-                Axios.post(`/api/me/subscriptions/${id}`, {
+                Axios.put(`/api/me/subscriptions/${id}`, {
                     event: parseInt(values.event)
                 }).then(res => {
                     console.log(res.data);
@@ -34,7 +39,10 @@ const Edit: React.FC<{subscriptions: SubscriptionType[], setSubscriptions: any}>
                     copy[index] = res.data;
                     setSubscriptions(copy);
                 }).catch(err => {
-                    console.log(err);
+                    notification.open({
+                        message: "Error",
+                        description: err.response.datar
+                    });
                 }).finally(() => {
                     setLoading(false);
                     

@@ -39,6 +39,11 @@ const orderSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
+    expiry: {
+        type: String,
+        enum: ["day", "cancel"],
+        required: false,
+    }
 });
 
 const Order = mongoose.model("Order", orderSchema);

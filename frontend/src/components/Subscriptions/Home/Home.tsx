@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Space, Switch, Table } from "antd";
+import { Button, notification, Space, Switch, Table } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { TableRowSelection } from "antd/lib/table/interface";
 import * as React from "react";
@@ -62,6 +62,11 @@ const Home: React.FC<{subscriptions: SubscriptionType[], handleToggle: (i: numbe
                             Axios.delete(`/api/me/subscriptions/${record._id}`).then(res => {
                                 let copy = [...subscriptions];
                                 setSubscriptions(copy.filter(item => item._id !== record._id));
+                            }).catch(err => {
+                                notification.open({
+                                    message: "Error",
+                                    description: err.response.data
+                                });
                             });
                         }}><DeleteOutlined/></Button>
                     </Space>

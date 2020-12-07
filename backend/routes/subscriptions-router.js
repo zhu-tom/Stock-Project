@@ -54,8 +54,12 @@ subscriptionsRouter.delete("/:id", (req, res, next) => {
     });
 }, sendSubs);
 
-subscriptionsRouter.post("/:id", (req, res) => {
+subscriptionsRouter.put("/:id", (req, res) => {
+    const prevPrice = req.sub.max / (1 + req.body.event);
     req.sub.event = req.body.event;
+    req.sub.min = prevPrice * (1 - req.body.event); 
+    req.sub.max = prevPrice * (1 + req.body.event); 
+
     req.sub.save((err, doc) => {
         if (err) {
             res.status(500).send("Failed to save");

@@ -1,5 +1,5 @@
 import { EyeOutlined, NotificationOutlined } from '@ant-design/icons';
-import { Button, Card, Descriptions, Form, Input, InputNumber, Modal, PageHeader, Radio, Select, Layout, Tabs, Checkbox } from 'antd';
+import { Button, Card, Descriptions, Form, Input, InputNumber, Modal, PageHeader, Radio, Select, Layout, Tabs, Checkbox, notification } from 'antd';
 import Axios from 'axios';
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
@@ -25,6 +25,12 @@ const Stock = () => {
     React.useEffect(() => {
         Axios.get(`/api/stocks/symbol/${symbol}`).then(res => {
             setStock(res.data);
+            console.log(res.data);
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
         });
         Axios.get(`/api/me/portfolio?stock=${symbol}`).then(res => {
             setPortfolio(res.data);
@@ -62,32 +68,37 @@ const Stock = () => {
                 <Tabs type="card">
                     <Tabs.TabPane tab="Today" key="1">
                         <Layout>
-                            <AreaChart label={symbol} data={stock?.history} range="day"/>
+                            <AreaChart label={symbol} data={stock?.trades} range="day"/>
                         </Layout>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="This Week" key="2">
                         <Layout>
-                            <AreaChart label={symbol} data={stock?.history} range="week"/>
+                            <AreaChart label={symbol} data={stock?.trades} range="week"/>
                         </Layout>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="This Month" key="3">
                         <Layout>
-                            <AreaChart label={symbol} data={stock?.history} range="month"/>
+                            <AreaChart label={symbol} data={stock?.trades} range="month"/>
                         </Layout>
                     </Tabs.TabPane>
                     <Tabs.TabPane tab="This Year" key="4">
                         <Layout>
-                            <AreaChart label={symbol} data={stock?.history} range="year"/>
+                            <AreaChart label={symbol} data={stock?.trades} range="year"/>
                         </Layout>
                     </Tabs.TabPane>
                 </Tabs>
             </Card>
             <Modal visible={isOrder} title="New Order" onCancel={() => setOrder(false)} onOk={() => orderForm.submit()}>
                 <Form onFinish={values => {
-                    const {amount, price, type} = values;
-                    Axios.post(`/api/stocks/symbol/${symbol}/orders`, {amount, price, type}).then(res => {
+                    const {amount, price, type, expiry} = values;
+                    Axios.post(`/api/stocks/symbol/${symbol}/orders`, {amount, price, type, expiry}).then(res => {
                         console.log(res.data);
                         setOrder(false);
+                    }).catch(err => {
+                        notification.open({
+                            message: "Error",
+                            description: err.response.data
+                        });
                     });
                 }} form={orderForm} preserve={false}>
                     <Form.Item required name="symbol" initialValue={symbol} label="Symbol">
@@ -107,8 +118,8 @@ const Stock = () => {
                     </Form.Item>
                     <Form.Item required name="expiry" label="Expiry">
                         <Select>
-                            <Select.Option value="nolimit">Until Cancelled</Select.Option>
-                            <Select.Option value="endday">End of Day</Select.Option>
+                            <Select.Option value="cancel">Until Cancelled</Select.Option>
+                            <Select.Option value="day">End of Day</Select.Option>
                         </Select>
                     </Form.Item>
                 </Form>
@@ -128,6 +139,11 @@ const Stock = () => {
                         lists: listIds,
                     }).then(res => {
                         console.log(res.data)
+                    }).catch(err => {
+                        notification.open({
+                            message: "Error",
+                            description: err.response.data
+                        });
                     }).finally(() => setList(false));
                 }} form={watchlistForm} preserve={false}>
                    {watchlists.map(list => {
@@ -149,6 +165,11 @@ const Stock = () => {
                     }).then(res => {
                         console.log(res.data);
                         setSub(false);
+                    }).catch(err => {
+                        notification.open({
+                            message: "Error",
+                            description: err.response.data
+                        });
                     });
                 }} form={subForm} preserve={false}>
                     <Form.Item required label="Symbol">

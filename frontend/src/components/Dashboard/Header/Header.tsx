@@ -1,13 +1,12 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
-import { AutoComplete, Avatar, Badge, Col, Input, Layout, Menu, Row, Typography } from 'antd';
+import { AutoComplete, Avatar, Badge, Col, Input, Layout, Menu, notification, Row, Typography } from 'antd';
 import * as React from 'react';
 import _ from 'lodash';
 import Axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { NotificationType, StockType } from '../../../types/StockTypes';
 import { SelectProps } from 'antd/lib/select';
-
-const data: string[] = ["Notification 1", "Notification 2","Notification 3"];
+import moment from 'moment';
 
 const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> = ({siderCollapsed, setSiderCollapsed}) => {
     const [results, setResults] = React.useState<StockType[]>([]);
@@ -18,7 +17,13 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
 
     React.useEffect(() => {
         Axios.get('/api/me/notifications?unreadOnly=true').then(res => {
+            console.log(res);
             setNotis(res.data);
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data
+            });
         });
     }, []);
 
@@ -31,6 +36,11 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
         if (value) {
             Axios.get(`/api/stocks?q=${value}`).then(res => {
                 setResults(res.data);
+            }).catch(err => {
+                notification.open({
+                    message: "Error",
+                    description: err.response.data
+                });
             });
         }
     }
@@ -59,6 +69,11 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
     const handleLogout = () => {
         Axios.post("/auth/logout").then(res => {
             history.push("/login");
+        }).catch(err => {
+            notification.open({
+                message: "Error",
+                description: err.response.data,
+            });
         });
     }
 
@@ -79,12 +94,15 @@ const Header: React.FC<{siderCollapsed: boolean, setSiderCollapsed: Function}> =
                         <Menu.SubMenu style={{margin: '0 10px', height:'64px'}} icon={<Badge count={notis.length}><NotificationOutlined/></Badge>} key="Noti">
                             {notis.map((value, index) => (
                                 <Menu.Item key={index} onClick={() => {
+                                    Axios.put(`/api/me/notifications/${value._id}`).then(res => {
+                                        console.log(res);
+                                    });
                                     history.push(`${value.type === "sub" ? `/account/subscriptions` : `/market/${value.trade?.order.symbol}`}`)
                                 }}>
                                     <Typography.Text type={value.type === "sub" ? "warning" : "success"}>
                                         {value.type === "sub" ? 
-                                        `Subscription: ${value.subscription?.symbol} changed by ${value.subscription?.event}%` :
-                                        `Trade: ${value.trade?.order.symbol} - ${value.trade?.amount} units at $${value.trade?.price}`}
+                                        `Subscription: ${value.subscription?.symbol} changed by ${value.subscription?.event}%, ${moment(value.datetime).fromNow()}` :
+                                        `Trade: ${value.trade?.order.symbol} - ${value.trade?.order.type === "buy" ? "Bought" : "Sold"} ${value.trade?.amount} units at $${value.trade?.price}, ${moment(value.datetime).fromNow()}`}
                                     </Typography.Text>
                                 </Menu.Item>
                             ))}

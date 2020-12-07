@@ -5,6 +5,7 @@ const User = require('../models/UserModel');
 const notificationsRouter = require('./notifications-router');
 const subscriptionsRouter = require('./subscriptions-router');
 const watchlistRouter = require('./watchlist-router');
+const bcrypt = require('bcrypt');
 
 const router = express.Router();
 const uidRouter = express.Router();
@@ -16,11 +17,20 @@ uidRouter.get("/", (req, res) => {
 });
 
 const cashBodyParser = (req, res, next) => {
-    const { amount } = req.body;
-    if (amount) {
-        next();
+    const { amount, password } = req.body;
+    if (amount && password) {
+        bcrypt.compare(password, req.user.password, (err, same) => {
+            if (err) {
+                res.status(500).send("Failed to compare passwords");
+            } else if (same) {
+                next();
+            } else {
+                res.status(401).send("Wrong password");
+            }
+        });
+
     } else {
-        res.status(400).send("Bad Request: No Amount Field");
+        res.status(400).send("Bad Request: missing fields");
     }
 }
 
@@ -108,7 +118,6 @@ uidRouter.get("/orders", (req, res) => {
         if (err) {
             res.status(500).send("Failed to query");
         } else {
-            console.log(docs);
             res.status(200).send(docs);
         }
     });

@@ -3,6 +3,7 @@ export type StockType = {
     name: string,
     symbol: string,
     price: number,
+    market: string,
     daily: {
         high: number,
         low: number,
@@ -12,7 +13,7 @@ export type StockType = {
         ask: number,
         bid: number,
     },
-    history: StockDataType[],
+    trades: StockDataType[],
 }
 
 export type StockDataType = { 
