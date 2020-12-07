@@ -142,6 +142,7 @@ tradeRouter.post("/orders", tradeBodyParser, (req, res) => {
         amount,
         price,
         type,
+        fulfilled: 0,
         creator: req.user._id,
         symbol: req.symbol.symbol,
         expiry
