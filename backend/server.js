@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const store = new MongoDBStore({
-    uri: 'mongodb://localhost:27017/tokens',
+    uri: process.env.MONGO_URI || 'mongodb://localhost/stockbroker',
     collection: 'sessions'
 });
 const express = require("express");

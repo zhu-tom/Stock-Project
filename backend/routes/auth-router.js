@@ -24,16 +24,16 @@ router.post("/signup", authBodyParser, (req, res) => {
         } else if (result) {
             res.status(403).send("Username taken");
         } else {
-            bcrypt.hash(password, ROUNDS, (err, pass) => {
-                if (err) {
+            bcrypt.hash(password, ROUNDS, (error, pass) => {
+                if (error) {
                     res.status(500).send("Password could not be hashed");
                 } else {
                     new User({
                         username,
                         password: pass,
                         data: [{datetime: Date.now(), value: 0}]
-                    }).save((err, doc) => {
-                        if (err) {
+                    }).save((e, doc) => {
+                        if (e) {
                             console.log(err);
                             res.status(500).send("Failed to save to database");
                         } else {
@@ -58,8 +58,8 @@ router.post("/login", authBodyParser, (req, res) => {
         } else if (!doc) {
             res.status(404).send("Username not found");
         } else {
-            bcrypt.compare(password, doc.password, (err, same) => {
-                if (err) {
+            bcrypt.compare(password, doc.password, (e, same) => {
+                if (e) {
                     res.status(500).send("Failed to compare passwords");
                 } else if (!same) {
                     res.status(401).send("Wrong password");
