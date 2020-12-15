@@ -23,6 +23,7 @@
     "moment": "^2.29.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-infinite-scroller": "^1.2.4",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "typescript": "^3.7.5"
@@ -48,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-infinite-scroller": "^1.2.1"
   }
 }

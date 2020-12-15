@@ -7,6 +7,7 @@ import SignUp from './components/Forms/SignUp/SignUp';
 import History from './components/History/History';
 import Home from './components/Home/Home';
 import Market from './components/Market/Market';
+import News from './components/News/News';
 import Orders from './components/Orders/Orders';
 import Portfolio from './components/Portfolio/Portfolio';
 import Subscriptions from './components/Subscriptions/Subscriptions';
@@ -41,6 +42,9 @@ function App() {
             </Route>
             <Route path="/market">
               <Market/>
+            </Route>
+            <Route path="/news">
+              <News/>
             </Route>
             <Route path="/">
               <Home/>

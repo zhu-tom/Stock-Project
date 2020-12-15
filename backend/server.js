@@ -1,4 +1,8 @@
+require('dotenv').config();
+
 const path = require("path");
+const NewsAPI = require("newsapi");
+const newsapi = new NewsAPI(process.env.API_KEY);
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -32,6 +36,22 @@ apiRouter.get('/ping', (req, res) => {
 apiRouter.use("/stocks", stocksRouter);
 apiRouter.use("/users", userRouter);
 apiRouter.use("/me", meRouter);
+apiRouter.get("/news", (req, res) => {
+    let { page, pageSize } = req.query;
+    if (!page) page = 1;
+    if (!pageSize) pageSize = 20;
+    newsapi.v2.topHeadlines({
+        category: "business",
+        language: "en",
+        country: 'us',
+        page,
+        pageSize
+    }).then(val => {
+        res.status(200).send(val);
+    }).catch(err => {
+        res.status(500).send("Failed to get news from API");
+    });
+});
 
 app.use('/api', apiRouter);
 
